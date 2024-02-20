@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:login/src/screens/signin_screen.dart';
+import 'package:login/screens/signin_screen.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -13,10 +13,6 @@ class _LogInState extends State<LogIn> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text('로그인'),
-        ),
         body: Form(
           child: Scrollbar(
             child: SingleChildScrollView(
