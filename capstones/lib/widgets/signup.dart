@@ -41,10 +41,11 @@ class _SignUpFormState extends State<SignUpForm> {
   String _password = '';
   String _nickname = '';
   String _gender = ''; // 'male', 'female'
-  String _birthdate = '';
+  //final String _birthdate = '';
   bool focus = true;
+  DateTime _birthDate = DateTime.now();
 
-  final TextEditingController _birthdateController = TextEditingController();
+  //final TextEditingController _birthdateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +160,24 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 20),
           //datepicker로
           const Text('생년월일'),
-          TextFormField(
+          ElevatedButton(
+            onPressed: () async {
+              final selectDate = await showDatePicker(
+                context: context,
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+              );
+              if (selectDate != null) {
+                setState(() {
+                  _birthDate = selectDate;
+                });
+              }
+            },
+            child: Text(
+              "${_birthDate.year.toString()}-${_birthDate.month.toString().padLeft(2, '0')}-${_birthDate.day.toString().padLeft(2, '0')}",
+            ),
+          ),
+          /*TextFormField(
             controller: _birthdateController,
             onChanged: (value) {
               setState(() {
@@ -182,7 +200,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
               ),
             ),
-          ),
+          ),*/
           const SizedBox(height: 50),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -199,7 +217,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 password: _password,
                 nickname: _nickname,
                 gender: _gender,
-                birthDate: _birthdate,
+                birthDate: _birthDate.toString(),
               );
               // 회원가입 정보 서버에 전송
               await saveUser(newMember); // saveUser 함수 호출을 await로 감싸기

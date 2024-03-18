@@ -42,9 +42,9 @@ class _AddDiariesState extends State<AddDiaries> {
                 height: 16,
               ),
               TextField(
-                expands: true,
+                expands: false,
                 controller: _textEditingController,
-                maxLines: null,
+                maxLines: 10,
                 onChanged: (value) {
                   setState(() {
                     _content = value;
