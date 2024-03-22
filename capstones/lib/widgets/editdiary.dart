@@ -5,55 +5,54 @@ import 'package:flutter/material.dart';
 
 class EditDiaries extends StatefulWidget {
   final String memberId;
-  const EditDiaries({super.key, required this.memberId});
+  final String selectedDate;
+  const EditDiaries(
+      {super.key, required this.memberId, required this.selectedDate});
 
   @override
   State<EditDiaries> createState() => _EditDiariesState();
 }
 
 class _EditDiariesState extends State<EditDiaries> {
-  late Future<Diaries?> diaries;
+  late Future<Diaries?> diary;
   bool isWrite = false;
   late TextEditingController _textEditingController;
   late String memberId;
+  late String writeDate;
 
   @override
   void initState() {
     super.initState();
     memberId = widget.memberId;
-    diaries = readDiary(memberId); //memberId
-    _textEditingController = TextEditingController(text: diaries.toString());
+    writeDate = widget.selectedDate;
+
+    diary = readDiary(memberId, writeDate); //memberId
+    _textEditingController = TextEditingController(text: diary.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-            maxWidth: MediaQuery.of(context).size.width * 0.8,
-          ),
-          child: Column(
-            children: [
-              FutureBuilder(
-                future: diaries,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: [
-                        TextField(
-                          controller: _textEditingController,
-                          enabled: isWrite,
-                        ),
-                      ],
-                    );
-                  }
-                  return const CircularProgressIndicator();
-                },
-              )
-            ],
-          ),
+        child: Column(
+          children: [
+            FutureBuilder(
+              future: diary,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      TextField(
+                        controller: _textEditingController,
+                        enabled: isWrite,
+                      ),
+                    ],
+                  );
+                }
+                return const CircularProgressIndicator();
+              },
+            )
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(

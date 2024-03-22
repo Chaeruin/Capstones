@@ -1,6 +1,8 @@
 import 'package:capstones/widgets/adddiary.dart';
 import 'package:capstones/widgets/editdiary.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class Diary extends StatefulWidget {
@@ -14,11 +16,20 @@ class _DiaryState extends State<Diary> {
   late DateTime selectedDate;
   bool isWrite = false;
   late String memberId;
+  String writeDate = ' ';
+  final storage = const FlutterSecureStorage();
 
   @override
   void initState() {
     selectedDate = DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _asyncMethod();
+    });
     super.initState();
+  }
+
+  _asyncMethod() async {
+    memberId = (await storage.read(key: 'memberId'))!;
   }
 
   @override
@@ -38,7 +49,8 @@ class _DiaryState extends State<Diary> {
               onTap: (CalendarTapDetails details) {
                 setState(() {
                   selectedDate = details.date!;
-                  print(selectedDate);
+                  writeDate = DateFormat('yyyyMMdd').format(selectedDate);
+                  print(writeDate);
                 });
               },
             ),
@@ -69,7 +81,8 @@ class _DiaryState extends State<Diary> {
               context,
               MaterialPageRoute(
                 builder: (context) => AddDiaries(
-                  selectedDate: selectedDate,
+                  memberId: memberId,
+                  selectedDate: writeDate,
                 ),
               ),
             );
@@ -77,7 +90,10 @@ class _DiaryState extends State<Diary> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditDiaries(memberId: memberId),
+                builder: (context) => EditDiaries(
+                  memberId: memberId,
+                  selectedDate: writeDate,
+                ),
               ),
             );
 
@@ -85,22 +101,6 @@ class _DiaryState extends State<Diary> {
               isWrite = true;
             });
           }
-          /*
-          String? newEntry = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddEntryPage(selectedDate)),
-          );
-          if (newEntry != null) {
-            setState(
-              () {
-                entries.add(DiaryEntry(
-                  text: newEntry,
-                  date: selectedDate ?? DateTime.now(),
-                ));
-              },
-            );
-          }
-        */
         },
         child: const Icon(Icons.edit),
       ),

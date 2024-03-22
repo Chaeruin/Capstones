@@ -2,6 +2,7 @@ import 'package:capstones/api_services/db_connect.dart';
 import 'package:capstones/models/member_model.dart';
 import 'package:capstones/screens/login.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SignUp extends StatelessWidget {
   const SignUp({super.key});
@@ -44,6 +45,7 @@ class _SignUpFormState extends State<SignUpForm> {
   //final String _birthdate = '';
   bool focus = true;
   DateTime _birthDate = DateTime.now();
+  String birthDate = '';
 
   //final TextEditingController _birthdateController = TextEditingController();
 
@@ -170,37 +172,13 @@ class _SignUpFormState extends State<SignUpForm> {
               if (selectDate != null) {
                 setState(() {
                   _birthDate = selectDate;
+                  birthDate = DateFormat('yyyyMMdd').format(_birthDate);
                 });
               }
             },
-            child: Text(
-              "${_birthDate.year.toString()}-${_birthDate.month.toString().padLeft(2, '0')}-${_birthDate.day.toString().padLeft(2, '0')}",
-            ),
+            child: Text(birthDate),
           ),
-          /*TextFormField(
-            controller: _birthdateController,
-            onChanged: (value) {
-              setState(() {
-                _birthdate = value;
-              });
-            },
-            decoration: const InputDecoration(
-              labelText: 'YYYYMMDD',
-              floatingLabelStyle: TextStyle(
-                color: Colors.grey,
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xFF98dfff),
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xFF98dfff),
-                ),
-              ),
-            ),
-          ),*/
+
           const SizedBox(height: 50),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -217,7 +195,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 password: _password,
                 nickname: _nickname,
                 gender: _gender,
-                birthDate: _birthDate.toString(),
+                birthDate: birthDate,
               );
               // 회원가입 정보 서버에 전송
               await saveUser(newMember); // saveUser 함수 호출을 await로 감싸기

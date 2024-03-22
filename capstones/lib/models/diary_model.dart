@@ -22,7 +22,6 @@ class Diaries {
 
   Map<String, dynamic> toJson() => {
         'memberId': memberId,
-        'diaryId': diaryId,
         'writeDate': writeDate,
         'content': content,
       };

@@ -1,11 +1,12 @@
 import 'package:capstones/api_services/db_connect.dart';
 import 'package:capstones/models/diary_model.dart';
-import 'package:capstones/screens/diary.dart';
 import 'package:flutter/material.dart';
 
 class AddDiaries extends StatefulWidget {
-  final DateTime selectedDate;
-  const AddDiaries({super.key, required this.selectedDate});
+  final String selectedDate;
+  final String memberId;
+  const AddDiaries(
+      {super.key, required this.selectedDate, required this.memberId});
 
   @override
   State<AddDiaries> createState() => _AddDiariesState();
@@ -13,7 +14,7 @@ class AddDiaries extends StatefulWidget {
 
 class _AddDiariesState extends State<AddDiaries> {
   late String _content;
-  late DateTime _writeDate;
+  late String _writeDate;
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -29,19 +30,15 @@ class _AddDiariesState extends State<AddDiaries> {
         title: const Text('페이지 추가'),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-            maxWidth: MediaQuery.of(context).size.width * 0.8,
-          ),
-          child: Column(
-            children: [
-              Text(
-                  "${_writeDate.month.toString().padLeft(2, '0')}-${_writeDate.day.toString().padLeft(2, '0')}"),
-              const SizedBox(
-                height: 16,
-              ),
-              TextField(
+        child: Column(
+          children: [
+            Text(_writeDate),
+            const SizedBox(
+              height: 16,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
                 expands: false,
                 controller: _textEditingController,
                 maxLines: 10,
@@ -51,22 +48,19 @@ class _AddDiariesState extends State<AddDiaries> {
                   });
                 },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Diaries newPage = Diaries(
-            writeDate: _writeDate.toString(),
+            memberId: widget.memberId,
+            writeDate: _writeDate,
             content: _content,
           );
           await saveDiary(newPage);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const Diary(),
-              ));
+          Navigator.pop(context);
         },
         child: const Icon(Icons.save),
       ),

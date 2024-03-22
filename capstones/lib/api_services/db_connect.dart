@@ -1,4 +1,7 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:capstones/models/diary_model.dart';
 import 'package:capstones/models/login_model.dart';
@@ -99,7 +102,7 @@ Future<bool> updateUser(Member member, String memberId) async {
   }
 }
 
-//다이어리 전송
+//다이어리 생성
 Future<bool> saveDiary(Diaries diary) async {
   try {
     final response = await http.post(
@@ -127,38 +130,49 @@ Future<bool> saveDiary(Diaries diary) async {
 }
 
 //ID로 일기 조회
-Future<Diaries?> readDiary(String memberId) async {
-  try {
-    final response = await http.get(
-      Uri.parse("hhttp://54.79.110.239:8080/api/diaries/member/$memberId"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
+Future<Diaries?> readDiary(String memberId, String writeDate) async {
+  //try {
+  final response = await http.get(
+    Uri.parse("http://54.79.110.239:8080/api/diaries/member/$memberId"),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
 
-    print('Response Status Code: ${response.statusCode}');
-    print('Response Body: ${utf8.decode(response.bodyBytes)}'); //인코딩 깨지는 부분 해결
+  print('Response Status Code: ${response.statusCode}');
+  print('Response Body: ${utf8.decode(response.bodyBytes)}'); //인코딩 깨지는 부분 해결
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      final Map<String, dynamic> userJson = responseData['user'];
+  if (response.statusCode == 200) {
+    final List<Map<String, dynamic>> responseData = jsonDecode(response.body);
+    Map<String, dynamic>? targetRecord;
+    //해당 날짜의 기록 탐색
+    for (var record in responseData) {
+      if (record['writeDate'] == writeDate) {
+        targetRecord = record;
+        break;
+      }
+    }
+    if (targetRecord != null) {
       return Diaries(
-        memberId: userJson['memberId'],
-        diaryId: userJson['diaryId'],
-        writeDate: userJson['writeDate'],
-        content: userJson['content'],
+        memberId: targetRecord['memberId'],
+        diaryId: targetRecord['diaryId'],
+        writeDate: targetRecord['writeDate'],
+        content: targetRecord['content'],
       );
     } else {
-      print("로그인 실패: ${response.statusCode}");
-      return null;
+      throw Error();
     }
-  } catch (e) {
+  }
+  throw Error();
+}
+/*
+   catch (e) {
     print("로그인 요청 실패: $e");
-    return null;
   }
 }
+*/
 
-//일기 수정
+//다이어리 수정
 Future<bool> updateDiary(Diaries diaries, String diaryId) async {
   try {
     final response = await http.put(
@@ -185,7 +199,7 @@ Future<bool> updateDiary(Diaries diaries, String diaryId) async {
   }
 }
 
-//일기 삭제
+//다이어리 삭제
 Future<bool> deleteDiary(String diaryId) async {
   try {
     final response = await http.put(
