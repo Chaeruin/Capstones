@@ -2,7 +2,7 @@ import 'package:capstones/api_services/db_connect.dart';
 import 'package:capstones/models/diary_model.dart';
 import 'package:capstones/widgets/adddiary.dart';
 import 'package:capstones/widgets/editdiary.dart';
-//import 'package:capstones/widgets/month_statics.dart';
+import 'package:capstones/widgets/month_statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
@@ -99,7 +99,7 @@ class _DiaryState extends State<Diary> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Container(),
+                    builder: (context) => const MonthStatisticsPage(),
                   ),
                 );
               },
@@ -117,7 +117,7 @@ class _DiaryState extends State<Diary> {
             Expanded(
               flex: 3,
               child: SfCalendar(
-                showDatePickerButton: true,
+                showNavigationArrow: true,
                 initialSelectedDate: selectedDate,
                 view: CalendarView.month,
                 headerStyle: const CalendarHeaderStyle(
@@ -126,16 +126,28 @@ class _DiaryState extends State<Diary> {
                     fontSize: 22,
                   ),
                 ),
+                onLongPress: (calendarLongPressDetails) async {
+                  writeDate = DateFormat('yyyyMMdd')
+                      .format(calendarLongPressDetails.date!);
+                  Diaries? content =
+                      await readDiarybyDate(memberId!, writeDate);
+
+                  if (content != null) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog.adaptive(
+                          content: Text(content.content),
+                        );
+                      },
+                    );
+                  }
+                },
                 onTap: (CalendarTapDetails details) {
                   setState(() {
-                    selectedDate = details.date!;
-                    writeDate = DateFormat('yyyyMMdd').format(selectedDate);
+                    writeDate = DateFormat('yyyyMMdd').format(details.date!);
                   });
                 },
-                monthViewSettings: const MonthViewSettings(
-                  appointmentDisplayMode:
-                      MonthAppointmentDisplayMode.appointment,
-                ),
                 monthCellBuilder: (context, details) {
                   final writedays = prefs!.getStringList('writedays');
                   if (writedays!.isNotEmpty) {
