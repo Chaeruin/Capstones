@@ -63,116 +63,42 @@ Widget _buildChart(AsyncSnapshot<MonthlyEmotion> snapshot) {
   var sentiment = snapshot.data!;
 
   // 여기 sentiment 받아서 처리하기
-  double joy =
-      (double.parse(sentiment.joy.replaceAll('%', '')) * 100).roundToDouble();
-  double hope =
-      (double.parse(sentiment.hope.replaceAll('%', '')) * 100).roundToDouble();
-  double neutrality =
-      (double.parse(sentiment.neutrality.replaceAll('%', '')) * 100)
-          .roundToDouble();
-  double sadness = (double.parse(sentiment.sadness.replaceAll('%', '')) * 100)
-      .roundToDouble();
-  double anger =
-      (double.parse(sentiment.anger.replaceAll('%', '')) * 100).roundToDouble();
-  double anxiety = (double.parse(sentiment.anxiety.replaceAll('%', '')) * 100)
-      .roundToDouble();
-  double tiredness =
-      (double.parse(sentiment.tiredness.replaceAll('%', '')) * 100)
-          .roundToDouble();
-  double regret = (double.parse(sentiment.regret.replaceAll('%', '')) * 100)
-      .roundToDouble();
+  double joy = (double.parse(sentiment.joy.replaceAll('%', '')));
+  double hope = (double.parse(sentiment.hope.replaceAll('%', '')));
+  double neutrality = (double.parse(sentiment.neutrality.replaceAll('%', '')));
+  double sadness = (double.parse(sentiment.sadness.replaceAll('%', '')));
+  double anger = (double.parse(sentiment.anger.replaceAll('%', '')));
+  double anxiety = (double.parse(sentiment.anxiety.replaceAll('%', '')));
+  double tiredness = (double.parse(sentiment.tiredness.replaceAll('%', '')));
+  double regret = (double.parse(sentiment.regret.replaceAll('%', '')));
 
-  final List<VBarChartModel> bardata = [
-    VBarChartModel(
-      index: 0,
-      label: "JOY!",
-      colors: [
-        const Color.fromARGB(255, 125, 201, 255),
-        const Color.fromARGB(255, 125, 201, 255)
-      ],
-      jumlah: joy,
-      tooltip: "$joy%",
-    ),
-    VBarChartModel(
-      index: 1,
-      label: "HOPE!",
-      colors: [
-        const Color.fromARGB(255, 255, 130, 141),
-        const Color.fromARGB(255, 255, 130, 141)
-      ],
-      jumlah: hope,
-      tooltip: "$hope%",
-    ),
-    VBarChartModel(
-      index: 2,
-      label: "NEUTRALITY!",
-      colors: [
-        const Color.fromARGB(255, 217, 255, 113),
-        const Color.fromARGB(255, 217, 255, 113)
-      ],
-      jumlah: neutrality,
-      tooltip: "$neutrality%",
-    ),
-    VBarChartModel(
-      index: 3,
-      label: "SADNESS!",
-      colors: [
-        const Color.fromARGB(255, 255, 136, 1),
-        const Color.fromARGB(255, 255, 136, 1),
-      ],
-      jumlah: sadness,
-      tooltip: "$sadness%",
-    ),
-    VBarChartModel(
-      index: 4,
-      label: "ANGER!",
-      colors: [
-        const Color.fromRGBO(0, 255, 123, 1),
-        const Color.fromRGBO(0, 255, 123, 1),
-      ],
-      jumlah: anger,
-      tooltip: "$anger%",
-    ),
-    VBarChartModel(
-      index: 5,
-      label: "ANXIETY!",
-      colors: [
-        const Color.fromRGBO(255, 0, 140, 1),
-        const Color.fromRGBO(255, 0, 140, 1),
-      ],
-      jumlah: anxiety,
-      tooltip: "$anxiety%",
-    ),
-    VBarChartModel(
-      index: 6,
-      label: "TIREDNESS!",
-      colors: [
-        const Color.fromRGBO(21, 6, 122, 1),
-        const Color.fromRGBO(21, 6, 122, 1),
-      ],
-      jumlah: tiredness,
-      tooltip: "$tiredness%",
-    ),
-    VBarChartModel(
-      index: 7,
-      label: "REGRET!",
-      colors: [
-        const Color.fromRGBO(58, 135, 14, 1),
-        const Color.fromRGBO(58, 135, 14, 1),
-      ],
-      jumlah: regret,
-      tooltip: "$regret%",
-    ),
+  final List chartData = [
+    _ChartData('joy', joy),
+    _ChartData('hope', hope),
+    _ChartData('neutrality', neutrality),
+    _ChartData('sadness', sadness),
+    _ChartData('anger', anger),
+    _ChartData('anxiety', anxiety),
+    _ChartData('tiredness', tiredness),
+    _ChartData('regret', regret),
   ];
 
-  return const SfCartesianChart(
-    primaryXAxis: CategoryAxis(),
-    primaryYAxis: NumericAxis(
-      minimum: 0,
-      maximum: 100,
-      interval: 25,
-    ),
-  );
+  return SfCartesianChart(
+      primaryXAxis: const CategoryAxis(
+        labelStyle: TextStyle(fontSize: 8),
+      ),
+      primaryYAxis: const NumericAxis(
+        minimum: 0,
+        maximum: 50,
+        interval: 25,
+      ),
+      series: [
+        ColumnSeries(
+          dataSource: chartData,
+          xValueMapper: (chartData, _) => chartData.x,
+          yValueMapper: (chartData, _) => chartData.y,
+        )
+      ]);
 }
 
 class _ChartData {
