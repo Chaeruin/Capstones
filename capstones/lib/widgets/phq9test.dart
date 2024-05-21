@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PHQ9 extends StatefulWidget {
   const PHQ9({super.key});
@@ -29,14 +30,47 @@ class TableForm extends StatefulWidget {
 
 class _TableFormState extends State<TableForm> {
   int score = 0;
-  Map<int, TableColumnWidth> columwidth = {
-    0: const FlexColumnWidth(3),
-    1: const FlexColumnWidth(0.5),
-    2: const FlexColumnWidth(0.5),
-    3: const FlexColumnWidth(0.5),
-    4: const FlexColumnWidth(0.5),
-  };
-  // 각 셀의 데이터를 저장할 변수들
+  SharedPreferences? prefs;
+  List<String> testScore = [];
+
+  final List<int> _selectedValues = List.filled(9, 0);
+
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final testScoreList = prefs!.getStringList('testScore');
+
+    if (testScoreList == null) {
+      await prefs!.setStringList('testScore', []);
+    } else if (testScoreList.length == 2) {
+      testScoreList[0] = testScoreList[1];
+      testScore = testScoreList;
+    } else {
+      testScore = testScoreList;
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _updateTestScore(String score) async {
+    testScore.add(score);
+    await prefs!.setStringList('testScore', testScore);
+    setState(() {});
+  }
+
+  void _onCheckboxChanged(int questionIndex, int value) {
+    setState(() {
+      _selectedValues[questionIndex] = value;
+      score = _selectedValues.reduce((a, b) => a + b);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initPrefs();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +85,15 @@ class _TableFormState extends State<TableForm> {
             children: [
               Table(
                 border: TableBorder.all(),
-                columnWidths: columwidth,
+                columnWidths: const {
+                  0: FlexColumnWidth(3),
+                  1: FlexColumnWidth(0.5),
+                  2: FlexColumnWidth(0.5),
+                  3: FlexColumnWidth(0.5),
+                  4: FlexColumnWidth(0.5),
+                },
                 children: [
-                  //headline
+                  // Headline
                   const TableRow(
                     children: [
                       TableCell(child: Center(child: Text('문        항'))),
@@ -63,555 +103,111 @@ class _TableFormState extends State<TableForm> {
                       TableCell(child: Center(child: Text('거의매일'))),
                     ],
                   ),
-                  //1번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child: Text(
-                        '기분이 가라앉거나, 우울하거나,\n 희망이 없다고 느꼈다.',
-                        style: TextStyle(),
-                      ))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  // Questions
+                  _buildTableRow(
+                    questionIndex: 0,
+                    questionText: '기분이 가라앉거나, 우울하거나,\n 희망이 없다고 느꼈다.',
                   ),
-                  //2번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child: Text(
-                                  '평소 하던 일에 대한 흥미가 \n없어지거나 즐거움을 느끼지 못했다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 1,
+                    questionText: '평소 하던 일에 대한 흥미가 \n없어지거나 즐거움을 느끼지 못했다.',
                   ),
-                  //3번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child:
-                                  Text('잠들기가 어렵거나 자주 깼다. /\n 혹은 너무 많이 잤다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 2,
+                    questionText: '잠들기가 어렵거나 자주 깼다. /\n 혹은 너무 많이 잤다.',
                   ),
-                  //4번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child:
-                                  Text('평소보다 식욕이 줄었다. /\n 혹은 평소보다 많이 먹었다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 3,
+                    questionText: '평소보다 식욕이 줄었다. /\n 혹은 평소보다 많이 먹었다.',
                   ),
-                  //5번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child: Text(
-                                  '다른 사람들이 눈치 챌 정도로 평소보다 말과 행동이 느려졌다. /\n 혹은 너무 안절부절 못해서 가만히 앉아있을 수 없었다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 4,
+                    questionText:
+                        '다른 사람들이 눈치 챌 정도로 평소보다 말과 행동이 느려졌다. /\n 혹은 너무 안절부절 못해서 가만히 앉아있을 수 없었다.',
                   ),
-                  //6번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(child: Text('피곤하고 기운이 없었다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 5,
+                    questionText: '피곤하고 기운이 없었다.',
                   ),
-                  //7번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child: Text(
-                                  '내가 잘못했거나, 실패했다는 생각이 들었다. /\n 혹은 자신과 가족을 실망시켰다고 생각했다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          activeColor: Colors.blueGrey,
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 6,
+                    questionText:
+                        '내가 잘못했거나, 실패했다는 생각이 들었다. /\n 혹은 자신과 가족을 실망시켰다고 생각했다.',
                   ),
-                  //8번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child: Text(
-                                  '신문을 읽거나 TV를 보는 것과 같은 일상적인 일에도 집중할 수가 없었다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 7,
+                    questionText: '신문을 읽거나 TV를 보는 것과 같은 일상적인 일에도 집중할 수가 없었다.',
                   ),
-                  //9번
-                  TableRow(
-                    children: [
-                      const TableCell(
-                          child: Center(
-                              child: Text(
-                                  '차라리 죽는 것은 더 낫겠다고 생각했다. /\n 혹은 자해할 생각을 했다.'))),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (value) => setState(
-                            () {
-                              score = score + 1;
-                              value = true;
-                            },
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 2;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Center(
-                          child: Checkbox(
-                            value: false,
-                            onChanged: (value) => setState(
-                              () {
-                                score = score + 3;
-                                value = true;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTableRow(
+                    questionIndex: 8,
+                    questionText: '차라리 죽는 것은 더 낫겠다고 생각했다. /\n 혹은 자해할 생각을 했다.',
                   ),
                 ],
               ),
-              //  - 0~4점 : 우울 아님
-
-              //  - 5~9점 : 가벼운 우울
-
-              //  - 10~19점 : 중간 정도의 우울
-
-              //  - 20~27점 : 심한 우울
-
+              // Score and Result
               IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return SimpleDialog(
-                          title: const Text('검사결과'),
-                          children: [
-                            Text('총 $score점 입니다'),
-                            if (score <= 4)
-                              const Text('우울 아님')
-                            else if (score > 4 && score <= 9)
-                              const Text('가벼운 우울')
-                            else if (score > 9 && score <= 19)
-                              const Text('중간 정도의 우울')
-                            else
-                              const Text('심한 우울')
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.check)),
+                onPressed: () {
+                  _updateTestScore(score.toString());
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return SimpleDialog(
+                        title: const Text('검사결과'),
+                        children: [
+                          Text('총 $score점 입니다'),
+                          if (score <= 4)
+                            const Text('우울 아님')
+                          else if (score > 4 && score <= 9)
+                            const Text('가벼운 우울')
+                          else if (score > 9 && score <= 19)
+                            const Text('중간 정도의 우울')
+                          else
+                            const Text('심한 우울')
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.check),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  TableRow _buildTableRow({
+    required int questionIndex,
+    required String questionText,
+  }) {
+    return TableRow(
+      children: [
+        TableCell(
+          child: Center(
+            child: Text(
+              questionText,
+              style: const TextStyle(),
+            ),
+          ),
+        ),
+        _buildCheckboxCell(questionIndex, 0),
+        _buildCheckboxCell(questionIndex, 1),
+        _buildCheckboxCell(questionIndex, 2),
+        _buildCheckboxCell(questionIndex, 3),
+      ],
+    );
+  }
+
+  TableCell _buildCheckboxCell(int questionIndex, int value) {
+    return TableCell(
+      child: Checkbox(
+        value: _selectedValues[questionIndex] == value,
+        onChanged: (isSelected) {
+          if (isSelected != null && isSelected) {
+            _onCheckboxChanged(questionIndex, value);
+          }
+        },
       ),
     );
   }

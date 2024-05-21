@@ -5,6 +5,7 @@ import 'package:capstones/widgets/statics.dart';
 import 'package:capstones/music.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum Emotion {
   joy,
@@ -35,11 +36,35 @@ class _AddDiariesState extends State<AddDiaries> {
   final TextEditingController _textEditingController = TextEditingController();
   String _emotionType = '';
   late String _selectedImage = 'lib/assets/images/giryong.png';
+  SharedPreferences? prefs;
+  Set<String> writedays = {};
+
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final writedaysList = prefs!.getStringList('writedays');
+
+    if (writedaysList == null) {
+      await prefs!.setStringList('writedays', []);
+    } else {
+      writedays = writedaysList.toSet();
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _updateWritedays(String date) async {
+    writedays.add(date);
+    await prefs!.setStringList('writedays', writedays.toList());
+    setState(() {});
+  }
 
   @override
   void initState() {
-    _writeDate = widget.selectedDate;
     super.initState();
+    _initPrefs();
+    _writeDate = widget.selectedDate;
   }
 
   Future<Map<String, dynamic>> analyzeSentiment(String text) async {
@@ -193,8 +218,7 @@ class _AddDiariesState extends State<AddDiaries> {
                 emotionType: _emotionType,
               );
               await saveDiary(newPage);
-              Navigator.pop(context, _emotionType);
-
+              _updateWritedays(_writeDate);
               Navigator.push(
                 context,
                 //music.dart에 감정 전송

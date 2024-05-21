@@ -98,9 +98,6 @@
     <item name="text2" type="id"/>
     <item name="title" type="id"/>
     <id name="view_tree_lifecycle_owner"/>
-    <id name="view_tree_on_back_pressed_dispatcher_owner"/>
-    <id name="view_tree_saved_state_registry_owner"/>
-    <id name="view_tree_view_model_store_owner"/>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="call_notification_answer_action">Answer</string>
     <string name="call_notification_answer_video_action">Video</string>

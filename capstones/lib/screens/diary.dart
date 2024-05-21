@@ -23,8 +23,8 @@ class _DiaryState extends State<Diary> {
   late String? memberId;
   String writeDate = DateFormat('yyyyMMdd').format(DateTime.now());
   final storage = const FlutterSecureStorage();
-  SharedPreferences? prefs;
   RefreshController? _refreshController;
+  SharedPreferences? prefs;
   Set<String> writedays = {};
 
   Future<void> _initPrefs() async {
@@ -42,12 +42,6 @@ class _DiaryState extends State<Diary> {
     }
   }
 
-  void _updateWritedays(String date) async {
-    writedays.add(date);
-    await prefs!.setStringList('writedays', writedays.toList());
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
@@ -61,9 +55,10 @@ class _DiaryState extends State<Diary> {
 
   Future<void> _onRefresh() async {
     // Fetch new data
-
+    await prefs!.setStringList('writedays', writedays.toList());
     setState(() {});
     // Call refresh complete when finished
+
     _refreshController!.refreshCompleted();
   }
 
@@ -137,7 +132,8 @@ class _DiaryState extends State<Diary> {
                       context: context,
                       builder: (context) {
                         return AlertDialog.adaptive(
-                          content: Text(content.content),
+                          content: Image.asset(
+                              'lib/assets/images/${content.emotionType}.png'),
                         );
                       },
                     );
@@ -146,6 +142,7 @@ class _DiaryState extends State<Diary> {
                 onTap: (CalendarTapDetails details) {
                   setState(() {
                     writeDate = DateFormat('yyyyMMdd').format(details.date!);
+                    print('$writedays');
                   });
                 },
                 monthCellBuilder: (context, details) {
@@ -228,7 +225,7 @@ class _DiaryState extends State<Diary> {
                             ),
                           ),
                         );
-                        _updateWritedays(writeDate);
+                        //_updateWritedays(writeDate);
                       }
                     },
                     child: SizedBox(
