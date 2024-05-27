@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key, this.memberId});
@@ -72,6 +73,7 @@ class ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> _messages = <ChatMessage>[];
   late String? memberId; // memberId 필드 추가
   int chatId = 0; // 일단 0으로 초기화
+  bool _isLoading = false;
 
   ChatScreenState({this.memberId}); // 생성자 수정
 
@@ -101,7 +103,7 @@ class ChatScreenState extends State<ChatScreen> {
       setState(() {
         chatId = responseData['chatId']; // chatId를 상태 변수에 저장
       });
-      print('채팅방이 생성되었습니다. chatId: $chatId, memId: $memberId');
+      print('채팅방이 생성되었습니다. chatId: $chatId');
     } else {
       print('채팅방 생성에 실패했습니다. 에러 코드: ${response.statusCode}');
     }
@@ -139,6 +141,10 @@ class ChatScreenState extends State<ChatScreen> {
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
+
     // Spring 서버에 메시지를 전송하는 요청
     final String springUrl =
         'http://54.79.110.239:8080/api/chat/requestMessageFromFlutter/$chatId';
@@ -165,6 +171,7 @@ class ChatScreenState extends State<ChatScreen> {
       final springResponseBody = jsonDecode(utf8.decode(response.bodyBytes));
       final receivedMessage =
           springResponseBody['response']; //여기는 사실 Flask로부터 온 응답임
+
       setState(() {
         // 상대방이 보낸 메시지를 리스트 맨 위에 추가
         _messages.insert(
@@ -174,9 +181,13 @@ class ChatScreenState extends State<ChatScreen> {
             isUser: false, // 상대방이 보낸 메시지이므로 isUser를 false로 설정
           ),
         );
+        _isLoading = false;
       });
     } else {
       print('Spring으로 메세지 전송에 실패했습니다. Error: ${response.reasonPhrase}');
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -201,6 +212,10 @@ class ChatScreenState extends State<ChatScreen> {
           // 메세지와 입력창을 구분하는 가로 선
           const Divider(height: 1.0),
           //입력창과 전송 버튼 포함된 부분
+          if (_isLoading)
+            Container(
+                alignment: Alignment.centerLeft,
+                child: Image.asset('lib/assets/images/loading.gif')),
           Container(
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
