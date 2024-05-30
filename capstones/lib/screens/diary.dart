@@ -33,6 +33,8 @@ class _DiaryState extends State<Diary> {
   SharedPreferences? prefs;
   Set<String> writedays = {};
   String? selectedEmotion;
+  int currentMonth = DateTime.now().month;
+  int currentYear = DateTime.now().year;
 
   Future<void> _initPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -59,6 +61,8 @@ class _DiaryState extends State<Diary> {
     });
     _initPrefs();
     _refreshController = RefreshController(initialRefresh: false);
+    int currentMonth = DateTime.now().month;
+    int currentYear = DateTime.now().year;
   }
 
   Future<void> _onRefresh() async {
@@ -85,7 +89,7 @@ class _DiaryState extends State<Diary> {
         backgroundColor: const Color(0xFF98dfff),
         centerTitle: true,
         title: Text(
-          '${selectedDate.year}년 ${selectedDate.month}월',
+          '$currentYear년 $currentMonth월',
           style: const TextStyle(
             fontSize: 25,
             fontWeight: FontWeight.bold,
@@ -111,12 +115,10 @@ class _DiaryState extends State<Diary> {
                     fontSize: 22,
                   ),
                 ),
-                 onLongPress: (calendarLongPressDetails) async {
+                onLongPress: (calendarLongPressDetails) async {
                   writeDate = DateFormat('yyyyMMdd')
                       .format(calendarLongPressDetails.date!);
-                  Diaries? content =
-                      await readDiarybyDate(memberId, writeDate);
-
+                  Diaries? content = await readDiarybyDate(memberId, writeDate);
                   if (content != null) {
                     showDialog(
                       context: context,
@@ -134,15 +136,28 @@ class _DiaryState extends State<Diary> {
                     writeDate = DateFormat('yyyyMMdd').format(details.date!);
                     selectedDate = details.date!;
                   });
-
-                  Diaries? selectedDiary = await readDiarybyDate(memberId, writeDate);
+                  Diaries? selectedDiary =
+                      await readDiarybyDate(memberId, writeDate);
                   setState(() {
                     selectedEmotion = selectedDiary?.emotionType ?? '';
                   });
-
                   widget.updateEmotion(selectedEmotion!);
-
-                  print('선택한 날짜의 날짜와 감정: $writeDate, Emotion: $selectedEmotion');
+                  print(
+                      '선택한 날짜의 날짜와 감정: $writeDate, Emotion: $selectedEmotion');
+                },
+                onViewChanged: (ViewChangedDetails viewChangedDetails) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      currentMonth = viewChangedDetails
+                          .visibleDates[
+                              viewChangedDetails.visibleDates.length ~/ 2]
+                          .month;
+                      currentYear = viewChangedDetails
+                          .visibleDates[
+                              viewChangedDetails.visibleDates.length ~/ 2]
+                          .year;
+                    });
+                  });
                 },
                 monthCellBuilder: (context, details) {
                   final writedays = prefs!.getStringList('writedays');
@@ -183,11 +198,11 @@ class _DiaryState extends State<Diary> {
                 children: [
                   Row(
                     children: [
-                       SizedBox(
-                      width: 100,  // 원하는 너비
-                      height: 150,  // 원하는 높이
-                      child: Image.asset('lib/assets/images/giryong.png'),
-                    ),
+                      SizedBox(
+                        width: 100, // 원하는 너비
+                        height: 150, // 원하는 높이
+                        child: Image.asset('lib/assets/images/giryong.png'),
+                      ),
                       Expanded(
                         child: Container(
                           width: 100,
@@ -216,7 +231,8 @@ class _DiaryState extends State<Diary> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EditDiaries(diary: newPage),
+                                builder: (context) =>
+                                    EditDiaries(diary: newPage),
                               ),
                             );
                           } else {
