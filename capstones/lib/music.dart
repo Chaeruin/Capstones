@@ -77,7 +77,7 @@ class _MusicState extends State<Music> {
                       String writeDate = DateFormat('yyyyMMdd').format(now);
                       Diaries? selectedDiary = await readDiarybyDate(widget.memberId, writeDate);
 
-                      print('Selected Emotion from Diary: ${selectedDiary}');
+                      print('Selected Emotion from Diary: $selectedDiary');
 
                       if (selectedDiary == null){
                         _showDialog(context); // 팝업 표시
@@ -172,14 +172,34 @@ void _showDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('감정 없음'),
-        content: const Text('이미 입력된 감정(일기)이 없습니다!'),
+        title: const Text(
+          '감정 없음',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+          fontSize: 25,
+          fontFamily: 'single_day',
+          color: Color.fromARGB(255, 254, 106, 197),
+           ),
+           ),
+        content: const Text(
+          '입력된 감정(일기)이 없습니다!',
+           style: TextStyle(
+          fontSize: 20,
+          fontFamily: 'single_day',
+           ),
+          ),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text('OK'),
+            child: const Text(
+              'OK',
+               style: TextStyle(
+          fontSize: 20,
+          fontFamily: 'single_day',
+           ),
+              ),
           ),
         ],
       );
