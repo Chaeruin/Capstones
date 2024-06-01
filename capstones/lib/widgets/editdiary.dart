@@ -1,11 +1,10 @@
-
 import 'package:capstones/api_services/db_connect.dart';
 import 'package:capstones/models/diary_model.dart';
 import 'package:flutter/material.dart';
-import 'package:capstones/music.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:capstones/widgets/statics.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum Emotion {
   joy,
@@ -17,24 +16,26 @@ enum Emotion {
   tiredness,
   regret,
 }
- Future<Map<String, dynamic>> analyzeSentiment(String text) async {
-    final url = Uri.parse('http://3.35.183.52:8081/analyze');
-    final payload = jsonEncode({'text': text});
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: payload,
-    );
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> result = jsonDecode(response.body);
-      print(result);
-      print("감정 전송 완료");
-      return result;
-    } else {
-      throw Exception('감정 분석 오류!!');
-    }
+Future<Map<String, dynamic>> analyzeSentiment(String text) async {
+  final url = Uri.parse('http://3.35.183.52:8081/analyze');
+  final payload = jsonEncode({'text': text});
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: payload,
+  );
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> result = jsonDecode(response.body);
+    print(result);
+    print("감정 전송 완료");
+    return result;
+  } else {
+    throw Exception('감정 분석 오류!!');
   }
+}
+
 class EditDiaries extends StatefulWidget {
   final Diaries diary;
 
@@ -54,6 +55,31 @@ class _EditDiariesState extends State<EditDiaries> {
   late String _content;
   String _emotionType = '';
   late String _selectedImage = 'lib/assets/images/giryong.png';
+  SharedPreferences? prefs;
+  List<String> writedays = [];
+
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final writedaysList = prefs!.getStringList('writedays');
+
+    if (writedaysList == null) {
+      await prefs!.setStringList('writedays', []);
+    } else {
+      writedays = writedaysList;
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _updateWritedays(String date) async {
+    writedays.remove(date);
+    await prefs!.setStringList(
+        'writedays', writedays); // writedays 리스트를 SharedPreferences에 저장합니다.
+    print(writedays);
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -61,9 +87,10 @@ class _EditDiariesState extends State<EditDiaries> {
     _textEditingController =
         TextEditingController(text: (widget.diary.content));
     _content = '';
-     _emotionType = widget.diary.emotionType;
+    _emotionType = widget.diary.emotionType;
     _diaryFuture = readDiarybyDiaryId(widget.diary.diaryId);
     _selectedImage = 'lib/assets/images/${widget.diary.emotionType}.png';
+    _initPrefs();
   }
 
   void _showImagePicker(BuildContext context) {
@@ -120,7 +147,8 @@ class _EditDiariesState extends State<EditDiaries> {
                 onPressed: () {
                   setState(() {
                     _selectedImage = 'lib/assets/images/neutrality.png';
-                    _emotionType = Emotion.neutrality.toString().split('.').last;
+                    _emotionType =
+                        Emotion.neutrality.toString().split('.').last;
                   });
                   Navigator.pop(context);
                 },
@@ -181,15 +209,17 @@ class _EditDiariesState extends State<EditDiaries> {
           IconButton(
             onPressed: () async {
               // 일기 삭제 기능 구현
-              bool isDeleted = await deleteDiary(widget.diary.diaryId.toString());
+              bool isDeleted =
+                  await deleteDiary(widget.diary.diaryId.toString());
               if (isDeleted) {
+                _updateWritedays(widget.diary.writeDate);
                 Navigator.pop(context);
               } else {
                 // 삭제 실패 처리
                 print("일기 삭제에 실패했습니다.");
               }
             },
-           icon: Image.asset(
+            icon: Image.asset(
               'lib/assets/images/delete.png',
               width: 35,
               height: 35,
@@ -197,30 +227,30 @@ class _EditDiariesState extends State<EditDiaries> {
           ),
           IconButton(
             onPressed: () async {
-               if (_content.isEmpty) {
+              if (_content.isEmpty) {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text(
                         '저장 실패',
-                         textAlign: TextAlign.center,
-                         style: TextStyle(
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
                           color: Color.fromARGB(255, 255, 95, 95),
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'single_day',
                         ),
-                        ),
+                      ),
                       content: const Text(
                         '일기 내용을 수정해주세요!',
                         textAlign: TextAlign.center,
-                         style: TextStyle(
+                        style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
                           fontFamily: 'single_day',
                         ),
-                        ),
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () {
@@ -228,12 +258,12 @@ class _EditDiariesState extends State<EditDiaries> {
                           },
                           child: const Text(
                             '확인',
-                             style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 20,
-                          fontFamily: 'single_day',
-                        ),
-                        ),
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 20,
+                              fontFamily: 'single_day',
+                            ),
+                          ),
                         ),
                       ],
                     );
@@ -255,7 +285,7 @@ class _EditDiariesState extends State<EditDiaries> {
               });
               Navigator.pop(context);
             },
-           icon: Image.asset(
+            icon: Image.asset(
               'lib/assets/images/month.png',
               width: 35,
               height: 35,
@@ -267,7 +297,7 @@ class _EditDiariesState extends State<EditDiaries> {
         child: FutureBuilder<Diaries>(
           future: _diaryFuture,
           builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
@@ -343,37 +373,38 @@ class _EditDiariesState extends State<EditDiaries> {
                       ),
                     ),
                   ),
-                   const SizedBox(height: 16),
-                   Container(
-                 width: 370, // 원하는 너비로 조정
-                 height: 50,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFE3EE),
-                  
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: TextButton(
-                  onPressed: () async {
-                    // 여기!! 여기에 data 전송 api 넣기
-                    // _content 가 넘어와야 함
-                    Map<String, dynamic> sentiment = await analyzeSentiment(_content);
-                    Navigator.push(
-                      // ignore: use_build_context_synchronously
-                      context,
-                      MaterialPageRoute(builder: (context) => Statics(sentiment: sentiment)),
-                    );
-                    
-                  },
-                  child: const Text(
-                    '오늘의 기분 상태 보기',
-                    style: TextStyle(
-                      color: Color(0xFFFB7474),
-                      fontSize: 25,
-                      fontFamily: 'single_day',
+                  const SizedBox(height: 16),
+                  Container(
+                    width: 370, // 원하는 너비로 조정
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFE3EE),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TextButton(
+                      onPressed: () async {
+                        // 여기!! 여기에 data 전송 api 넣기
+                        // _content 가 넘어와야 함
+                        Map<String, dynamic> sentiment =
+                            await analyzeSentiment(_content);
+                        Navigator.push(
+                          // ignore: use_build_context_synchronously
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  Statics(sentiment: sentiment)),
+                        );
+                      },
+                      child: const Text(
+                        '오늘의 기분 상태 보기',
+                        style: TextStyle(
+                          color: Color(0xFFFB7474),
+                          fontSize: 25,
+                          fontFamily: 'single_day',
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
                 ],
               );
             }

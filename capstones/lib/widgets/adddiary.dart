@@ -2,7 +2,6 @@ import 'package:capstones/api_services/db_connect.dart';
 import 'package:capstones/models/diary_model.dart';
 import 'package:flutter/material.dart';
 import 'package:capstones/widgets/statics.dart';
-import 'package:capstones/music.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 application
-INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:2:5-32:19
+INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:2:5-33:19
 MERGED from [:url_launcher_android] C:\Capstone\ljy\capstones\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-14:19
 MERGED from [:url_launcher_android] C:\Capstone\ljy\capstones\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:5-14:19
 MERGED from [androidx.window:window:1.0.0-beta04] C:\Users\LG\.gradle\caches\transforms-3\2534cb10a453dd1f7318651afba4a7a8\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:24:5-31:19
@@ -14,11 +14,11 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\LG
 	android:name
 		INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml
 manifest
-ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
-INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
-INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
-INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
-MERGED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
+ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
+INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
+INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
+INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
+MERGED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
 MERGED from [:flutter_secure_storage] C:\Capstone\ljy\capstones\build\flutter_secure_storage\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-11:12
 MERGED from [:path_provider_android] C:\Capstone\ljy\capstones\build\path_provider_android\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
 MERGED from [:shared_preferences_android] C:\Capstone\ljy\capstones\build\shared_preferences_android\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
@@ -48,30 +48,30 @@ INJECTED from C:\Capstone\ljy\capstones\android\app\src\debug\AndroidManifest.xm
 INJECTED from C:\Capstone\ljy\capstones\android\app\src\debug\AndroidManifest.xml:1:1-7:12
 	package
 		INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
+		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
 		INJECTED from C:\Capstone\ljy\capstones\android\app\src\debug\AndroidManifest.xml
 	android:versionName
 		INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
+		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
 		INJECTED from C:\Capstone\ljy\capstones\android\app\src\debug\AndroidManifest.xml
 	android:versionCode
 		INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml
-		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-44:12
+		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:1-45:12
 		INJECTED from C:\Capstone\ljy\capstones\android\app\src\debug\AndroidManifest.xml
 	xmlns:android
 		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:1:11-69
 queries
-ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:38:5-43:15
+ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:39:5-44:15
 intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
-ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:39:9-42:18
+ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:40:9-43:18
 action#android.intent.action.PROCESS_TEXT
-ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:40:13-72
+ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:41:13-72
 	android:name
-		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:40:21-70
+		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:41:21-70
 data
-ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:41:13-50
+ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:42:13-50
 	android:mimeType
-		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:41:19-48
+		ADDED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml:42:19-48
 uses-sdk
 INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Capstone\ljy\capstones\android\app\src\main\AndroidManifest.xml
