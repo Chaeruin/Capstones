@@ -2,23 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
-
 import 'dart:async';
 import 'dart:convert';
 
 // enum DataKind { NONE, JOY, HOPE, NEUTRALITY, SADNESS, ANGER, ANXIETY, TIREDNESS, REGRET }
 enum DataKind { OK }
-
 enum Kind { NONE, EMPATHY, OVERCOME }
 
 Future<String?> fetchString(DataKind dataKind, String emotion) async {
-  final Uri url = Uri.parse('http://10.0.2.2:5001/music/recommendation');
+  final Uri url = Uri.parse('http://3.35.183.52:8081/music/recommendation');
   final http.Response response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({'emotion': emotion}),
   );
-  //final response = await http.get(Uri.parse('http://10.0.2.2:5001/music/recommendation'));
+  
   if (response.statusCode == 200) {
     print('감정 전송 성공: ${response.body}');
   } else {
@@ -33,134 +31,141 @@ Future<String?> fetchString(DataKind dataKind, String emotion) async {
 }
 
 class KeyWordToMusic extends StatefulWidget {
-  final String emotion;
-  const KeyWordToMusic({super.key, required this.emotion});
+   final String emotion;
+   const KeyWordToMusic({super.key, required this.emotion});
 
   @override
   _KeyWordToMusicState createState() => _KeyWordToMusicState();
 }
 
 class _KeyWordToMusicState extends State<KeyWordToMusic> {
-  String _selectedCategory = '';
-  final String musicRecommendationUrl =
-      'https://youtu.be/XEfle_XvYiw?si=sS2MryzR7k2d6z3w';
-  final ScrollController _scrollController = ScrollController();
+  String _selectedCategory = 'empathy';
+  final String musicRecommendationUrl = 'https://youtu.be/XEfle_XvYiw?si=sS2MryzR7k2d6z3w';
+  final ScrollController _scrollController = ScrollController(); 
 
   Kind mKind = Kind.NONE;
   DataKind nKind = DataKind.OK;
 
   Widget makeChild(String str, Kind kind) {
-    Map<String, dynamic> items = jsonDecode(str);
-    // print(items);
+  Map<String, dynamic> items = jsonDecode(str);
 
-    switch (kind) {
-      case Kind.NONE:
-        return const Placeholder();
+  List<Widget> widgetListA = [];
+  List<Widget> widgetListB = [];
+  switch (kind) {
+    case Kind.NONE:
+      return Container(); // Return an empty container when no category is selected
 
-      case Kind.EMPATHY:
-        List<Widget> widgetList = [];
-
-        for (int i = 0; i < 5; i++) {
-          final musicName = items['empathy'][i]['name'];
-          final musicArtist = items['empathy'][i]['artist'];
-
-          widgetList.add(Column(children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.network(items['empathy'][i]['image']),
-                const SizedBox(height: 20),
-                const SizedBox(width: 50),
-                InkWell(
-                  onTap: () {
-                    _launchURL(musicRecommendationUrl);
-                  },
-                  child: Container(
-                    width: 200,
-                    height: 100,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          musicName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 0, 89, 130),
+    case Kind.EMPATHY:
+      
+      for (int i = 0; i < 5; i++) {
+        final musicName = items['empathy'][i]['name'];
+        final musicArtist = items['empathy'][i]['artist'];
+        widgetListA.add(
+          Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(items['empathy'][i]['image']),
+                  const SizedBox(height: 20),
+                  const SizedBox(width: 50),
+                  InkWell(
+                    onTap: () {
+                      //_launchURL(musicRecommendationUrl);
+                    },
+                    child: Container(
+                      width: 200,
+                      height: 100,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            musicName,
+                            style: const TextStyle (
+                              fontSize: 18,
+                              color: Color.fromARGB(255, 0, 89, 130),
+                            ),
                           ),
-                        ),
-                        Text(
-                          musicArtist,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: Color.fromARGB(255, 0, 145, 211),
+                          Text(
+                            musicArtist,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Color.fromARGB(255, 0, 145, 211),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ]));
-        }
-        {}
-        return Column(children: widgetList);
+                ],
+              ),
+            ]
+          )
+        );
+      }
+      return Column(children: widgetListA);
 
-      case Kind.OVERCOME:
-        List<Widget> widgetList = [];
-
-        for (int i = 0; i < 5; i++) {
-          final musicName = items['overcome'][i]['name'];
-          final musicArtist = items['overcome'][i]['artist'];
-
-          widgetList.add(Column(children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.network(items['empathy'][i]['image']),
-                const SizedBox(height: 20),
-                const SizedBox(width: 50),
-                InkWell(
-                  onTap: () {
-                    _launchURL(musicRecommendationUrl);
-                  },
-                  child: Container(
-                    width: 200,
-                    height: 100,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          musicName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 0, 89, 130),
+    case Kind.OVERCOME:
+      
+      for (int i = 0; i < 5; i++) {
+        final musicName = items['overcome'][i]['name'];
+        final musicArtist = items['overcome'][i]['artist'];
+        widgetListB.add(
+          Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(items['overcome'][i]['image']),
+                  const SizedBox(height: 20),
+                  const SizedBox(width: 50),
+                  InkWell(
+                    onTap: () {
+                      //_launchURL(musicRecommendationUrl);
+                    },
+                    child: Container(
+                      width: 200,
+                      height: 100,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            musicName,
+                            style: const TextStyle (
+                              fontSize: 18,
+                              color: Color.fromARGB(255, 0, 89, 130),
+                            ),
                           ),
-                        ),
-                        Text(
-                          musicArtist,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: Color.fromARGB(255, 0, 145, 211),
+                          Text(
+                            musicArtist,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Color.fromARGB(255, 0, 145, 211),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ]));
-        }
-        {}
-        return Column(children: widgetList);
-    }
+                ],
+              ),
+            ]
+          )
+        );
+      }
+      return Column(children: widgetListB);
+
+    default:
+      return Column(children: widgetListA);
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
+    mKind = Kind.EMPATHY;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -188,7 +193,7 @@ class _KeyWordToMusicState extends State<KeyWordToMusic> {
                       fit: BoxFit.fill,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                   const SizedBox(height: 20),
                   Text(
                     '"${widget.emotion}"에 어울리는 음악',
                     style: const TextStyle(
@@ -219,7 +224,7 @@ class _KeyWordToMusicState extends State<KeyWordToMusic> {
                             color: _selectedCategory == 'empathy'
                                 ? Colors.grey
                                 : Colors.transparent,
-                          ),
+                          ), 
                           child: const Text(
                             'Empathy',
                             style: TextStyle(
@@ -271,27 +276,34 @@ class _KeyWordToMusicState extends State<KeyWordToMusic> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         controller: _scrollController,
-                        child: Column(children: [
-                          FutureBuilder(
-                            future: fetchString(nKind, widget.emotion),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                return Center(
-                                  child: makeChild(
-                                      snapshot.data.toString(), mKind),
-                                );
-                              } else if (snapshot.hasError) {
-                                return Text('${snapshot.error}');
-                              } else {
-                                return const Center(
+                        child: Column(
+                          children: [
+                            
+                            FutureBuilder(
+                              future: fetchString(nKind, widget.emotion),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  if (mKind == Kind.OVERCOME) {
+                                    return Center(
+                                    child: makeChild(snapshot.data.toString(), Kind.OVERCOME),
+                                  );
+                                  }
+                                  return Center(
+                                    child: makeChild(snapshot.data.toString(), mKind),
+                                  );
+                                }
+                                else if (snapshot.hasError) {
+                                  return Text('${snapshot.error}');
+                                }
+                                else {return const Center(
                                   child: CircularProgressIndicator(),
                                 );
-                              }
-                            },
-                          ),
-                        ]),
-                      ),
+                                }
+                              },
+                            ),
+                          ]
+                        ),
+                      ), 
                     ),
                   ),
                 ],
@@ -318,8 +330,7 @@ class MusicRecommendationItem extends StatelessWidget {
   final String artist;
   final String url;
 
-  const MusicRecommendationItem({
-    super.key,
+  const MusicRecommendationItem({super.key, 
     required this.imageUrl,
     required this.title,
     required this.artist,

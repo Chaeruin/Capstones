@@ -31,13 +31,14 @@ class AddDiaries extends StatefulWidget {
 }
 
 class _AddDiariesState extends State<AddDiaries> {
-  late String _content;
+  late String _content = '';
   late String _writeDate;
   final TextEditingController _textEditingController = TextEditingController();
   String _emotionType = '';
   late String _selectedImage = 'lib/assets/images/giryong.png';
+
   SharedPreferences? prefs;
-  Set<String> writedays = {};
+  List<String> writedays = [];
 
   Future<void> _initPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -46,7 +47,7 @@ class _AddDiariesState extends State<AddDiaries> {
     if (writedaysList == null) {
       await prefs!.setStringList('writedays', []);
     } else {
-      writedays = writedaysList.toSet();
+      writedays = writedaysList;
     }
 
     if (mounted) {
@@ -56,7 +57,9 @@ class _AddDiariesState extends State<AddDiaries> {
 
   void _updateWritedays(String date) async {
     writedays.add(date);
-    await prefs!.setStringList('writedays', writedays.toList());
+    await prefs!.setStringList(
+        'writedays', writedays); // writedays 리스트를 SharedPreferences에 저장합니다.
+    print(writedays);
     setState(() {});
   }
 
@@ -68,7 +71,7 @@ class _AddDiariesState extends State<AddDiaries> {
   }
 
   Future<Map<String, dynamic>> analyzeSentiment(String text) async {
-    final url = Uri.parse('http://10.0.2.2:5001/analyze');
+    final url = Uri.parse('http://3.35.183.52:8081/analyze');
     final payload = jsonEncode({'text': text});
     final response = await http.post(
       url,
@@ -209,6 +212,77 @@ class _AddDiariesState extends State<AddDiaries> {
         actions: [
           IconButton(
             onPressed: () async {
+              if (_emotionType.isEmpty) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: const Color(0xFFFFE3EE),
+                      content: const Text(
+                        '감정을 선택해주세요!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontFamily: 'single_day',
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            '확인',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 20,
+                              fontFamily: 'single_day',
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+                return;
+              }
+              if (_content.isEmpty) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: const Color(0xFFFFE3EE),
+                      content: const Text(
+                        '내용을 입력해주세요!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontFamily: 'single_day',
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            '확인',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 61, 149, 250),
+                              fontSize: 20,
+                              fontFamily: 'single_day',
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+                return;
+              }
+
               //백엔드 요청
               Diaries newPage = Diaries(
                 diaryId: 0,
@@ -219,15 +293,7 @@ class _AddDiariesState extends State<AddDiaries> {
               );
               await saveDiary(newPage);
               _updateWritedays(_writeDate);
-              Navigator.push(
-                context,
-                //music.dart에 감정 전송
-                MaterialPageRoute(
-                  builder: (context) => Music(
-                    selectedEmotionFromDiary: _emotionType,
-                  ),
-                ),
-              );
+              Navigator.pop(context, _emotionType);
             },
             icon: Image.asset(
               'lib/assets/images/month.png',
@@ -265,6 +331,7 @@ class _AddDiariesState extends State<AddDiaries> {
                       ),
                       child: const Text(
                         '저를 클릭해서 당신의 \n기분을 선택하세요!',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 22,

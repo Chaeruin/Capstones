@@ -4,7 +4,6 @@ import 'package:capstones/widgets/tot_emotion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 class Statistics extends StatefulWidget {
   final String memberId;
   const Statistics({super.key, required this.memberId});
@@ -15,6 +14,7 @@ class Statistics extends StatefulWidget {
 
 class _StatisticsState extends State<Statistics> {
   late String memberId;
+   int bottomNavIndex = 0;
   SharedPreferences? prefs;
   List<String> testScore = ['', ''];
 
@@ -50,9 +50,8 @@ class _StatisticsState extends State<Statistics> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('통계'),
-        centerTitle: true,
-      ),
+         
+        ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StaggeredGrid.count(
@@ -71,12 +70,32 @@ class _StatisticsState extends State<Statistics> {
               child: GestureDetector(
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PHQ9()),
+                  MaterialPageRoute(builder: (context) =>  PHQ9(memberId: memberId,)),
                 ),
-                child: const Center(
-                  child: Text(
-                    '우울체크',
-                    style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+                child: Center(
+                child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFE3EE),
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      '우울증 건강 설문\n해보기',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        //fontWeight: FontWeight.bold,
+                        fontFamily: 'single_day',
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -86,8 +105,27 @@ class _StatisticsState extends State<Statistics> {
               mainAxisCellCount: 2,
               child: Center(
                 child: Container(
+                   padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF98dfff),
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
                   child: Text(
-                    '우울체크 트래킹\n이전 검사결과: ${testScore[0]}\n이번 검사결과: ${testScore[1]}',
+                    '우울체크 트래킹\n"이전" 검사결과: ${testScore.isNotEmpty ? testScore[0] : ''}\n"이번" 검사결과: ${testScore.length > 1 ? testScore[1] : ''}',
+                    textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        //fontWeight: FontWeight.bold,
+                        fontFamily: 'single_day',
+                      ),
                   ),
                 ),
               ),

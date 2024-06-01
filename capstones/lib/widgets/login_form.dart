@@ -33,7 +33,7 @@ class _LoginFormState extends State<LoginForm> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LoginedMain(memberId: userInfo),
+          builder: (context) => LoginedMain(memberId: userInfo,selectedDate: DateTime.now().toString(),),
         ),
       );
     }
@@ -125,6 +125,7 @@ class _LoginFormState extends State<LoginForm> {
                     MaterialPageRoute(
                       builder: (context) => LoginedMain(
                         memberId: id,
+                        selectedDate: DateTime.now().toString(),
                       ),
                     ),
                   );

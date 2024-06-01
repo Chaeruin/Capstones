@@ -1,3 +1,4 @@
+
 import 'package:capstones/api_services/db_connect.dart';
 import 'package:capstones/models/statistics_model.dart';
 import 'package:flutter/material.dart';
@@ -47,12 +48,16 @@ class _Top3EmotionState extends State<Top3Emotion> {
             children: [
               Title(
                 color: Colors.black,
-                child: const Text('많이 기록한 감정'),
+                child: const Text(
+                   textAlign: TextAlign.center,
+                  '   이번달 당신이 가장 많이 느낀 감정이에요!',
+                      style: TextStyle(
+                        fontSize: 20,
+                        //fontWeight: FontWeight.bold,
+                        fontFamily: 'single_day',
+                      ),
+                      ),
               ),
-              const SizedBox(
-                width: 20,
-              ),
-              const Text('몇월?'),
             ],
           ),
           FutureBuilder(
@@ -87,7 +92,7 @@ ListView makeList(AsyncSnapshot<List<Top3Emotions>> snapshot) {
       );
     },
     separatorBuilder: (context, index) => const SizedBox(
-      width: 30,
+      width: 25,
     ),
   );
 }
@@ -102,12 +107,26 @@ class Top3 extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Image.asset(
-        'lib/assets/images/$emotionType.png',
-        fit: BoxFit.scaleDown,
-      ),
-    );
-  }
+Widget build(BuildContext context) {
+  return SizedBox(
+    width: 110, // 원하는 너비로 설정
+    height: 150, // 이미지와 텍스트를 포함한 높이로 설정
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(
+          'lib/assets/images/$emotionType.png',
+          width: 110,
+          height: 110,
+        ),
+        const SizedBox(height: 5), // 이미지와 텍스트 사이의 간격
+        Text(
+          emotionType, // 원하는 텍스트로 변경
+          style: const TextStyle(fontSize: 10), // 적절한 크기로 텍스트 스타일 설정
+        ),
+      ],
+    ),
+  );
+}
+
 }

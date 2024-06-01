@@ -2,7 +2,6 @@ import 'package:capstones/api_services/db_connect.dart';
 import 'package:capstones/models/diary_model.dart';
 import 'package:capstones/widgets/adddiary.dart';
 import 'package:capstones/widgets/editdiary.dart';
-import 'package:capstones/widgets/month_statics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +10,14 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Diary extends StatefulWidget {
-  const Diary({super.key});
+  final String memberId;
+  final Function(String) updateEmotion;
+
+  const Diary({
+    super.key,
+    required this.memberId,
+    required this.updateEmotion,
+  });
 
   @override
   State<Diary> createState() => _DiaryState();
@@ -20,21 +26,40 @@ class Diary extends StatefulWidget {
 class _DiaryState extends State<Diary> {
   late DateTime selectedDate;
   bool isWrite = false;
-  late String? memberId;
+  late String memberId;
   String writeDate = DateFormat('yyyyMMdd').format(DateTime.now());
   final storage = const FlutterSecureStorage();
-  RefreshController? _refreshController;
+  late RefreshController _refreshController;
   SharedPreferences? prefs;
-  Set<String> writedays = {};
+  List<String> writedays = [];
+  String? selectedEmotion;
+  int currentMonth = DateTime.now().month;
+  int currentYear = DateTime.now().year;
+
+  @override
+  void initState() {
+    super.initState();
+    memberId = widget.memberId;
+    selectedDate = DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _asyncMethod();
+    });
+    _initPrefs();
+    _refreshController = RefreshController(initialRefresh: false);
+    int currentMonth = DateTime.now().month;
+    int currentYear = DateTime.now().year;
+  }
 
   Future<void> _initPrefs() async {
     prefs = await SharedPreferences.getInstance();
+    _updateWritedays();
+  }
+
+  Future<void> _updateWritedays() async {
     final writedaysList = prefs!.getStringList('writedays');
 
-    if (writedaysList == null) {
-      await prefs!.setStringList('writedays', []);
-    } else {
-      writedays = writedaysList.toSet();
+    if (writedaysList != null) {
+      writedays = writedaysList;
     }
 
     if (mounted) {
@@ -42,28 +67,16 @@ class _DiaryState extends State<Diary> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    selectedDate = DateTime.now();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _asyncMethod();
-    });
-    _initPrefs();
-    _refreshController = RefreshController(initialRefresh: false);
-  }
-
   Future<void> _onRefresh() async {
-    // Fetch new data
-    await prefs!.setStringList('writedays', writedays.toList());
+    _updateWritedays(); // writedays 리스트를 업데이트합니다.
+    print(writedays);
     setState(() {});
-    // Call refresh complete when finished
-
-    _refreshController!.refreshCompleted();
+    _refreshController.refreshCompleted();
   }
 
   _asyncMethod() async {
-    memberId = (await storage.read(key: 'memberId'));
+    memberId = (await storage.read(key: 'memberId'))!;
+    setState(() {});
   }
 
   @override
@@ -79,32 +92,16 @@ class _DiaryState extends State<Diary> {
         backgroundColor: const Color(0xFF98dfff),
         centerTitle: true,
         title: Text(
-          '${selectedDate.year}년 ${selectedDate.month}월',
+          '$currentYear년 $currentMonth월',
           style: const TextStyle(
             fontSize: 25,
             fontWeight: FontWeight.bold,
             fontFamily: 'single_day',
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MonthStatisticsPage(),
-                  ),
-                );
-              },
-              child: Image.asset('lib/assets/images/month.png'),
-            ),
-          ),
-        ],
       ),
       body: SmartRefresher(
-        controller: _refreshController!,
+        controller: _refreshController,
         enablePullDown: true,
         onRefresh: _onRefresh,
         child: Column(
@@ -124,9 +121,7 @@ class _DiaryState extends State<Diary> {
                 onLongPress: (calendarLongPressDetails) async {
                   writeDate = DateFormat('yyyyMMdd')
                       .format(calendarLongPressDetails.date!);
-                  Diaries? content =
-                      await readDiarybyDate(memberId!, writeDate);
-
+                  Diaries? content = await readDiarybyDate(memberId, writeDate);
                   if (content != null) {
                     showDialog(
                       context: context,
@@ -139,10 +134,32 @@ class _DiaryState extends State<Diary> {
                     );
                   }
                 },
-                onTap: (CalendarTapDetails details) {
+                onTap: (CalendarTapDetails details) async {
                   setState(() {
                     writeDate = DateFormat('yyyyMMdd').format(details.date!);
-                    print('$writedays');
+                    selectedDate = details.date!;
+                  });
+                  Diaries? selectedDiary =
+                      await readDiarybyDate(memberId, writeDate);
+                  setState(() {
+                    selectedEmotion = selectedDiary?.emotionType ?? '';
+                  });
+                  widget.updateEmotion(selectedEmotion!);
+                  print(
+                      '선택한 날짜의 날짜와 감정: $writeDate, Emotion: $selectedEmotion');
+                },
+                onViewChanged: (ViewChangedDetails viewChangedDetails) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      currentMonth = viewChangedDetails
+                          .visibleDates[
+                              viewChangedDetails.visibleDates.length ~/ 2]
+                          .month;
+                      currentYear = viewChangedDetails
+                          .visibleDates[
+                              viewChangedDetails.visibleDates.length ~/ 2]
+                          .year;
+                    });
                   });
                 },
                 monthCellBuilder: (context, details) {
@@ -166,7 +183,6 @@ class _DiaryState extends State<Diary> {
                       }
                     }
                   }
-
                   return Center(
                     child: Column(
                       children: [
@@ -181,62 +197,70 @@ class _DiaryState extends State<Diary> {
             ),
             Expanded(
               flex: 1,
-              child: Row(
+              child: Column(
                 children: [
-                  Image.asset('lib/assets/images/giryong.png'),
-                  Expanded(
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF98dfff),
-                        borderRadius: BorderRadius.circular(30),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 100, // 원하는 너비
+                        height: 150, // 원하는 높이
+                        child: Image.asset('lib/assets/images/giryong.png'),
                       ),
-                      child: const Text(
-                        '오늘 무슨 일이 있었는지 \n기룡이에게 솔직하게\n 털어 놓아 보아요!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: 'single_day',
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  GestureDetector(
-                    onDoubleTap: () {},
-                    onTap: () async {
-                      Diaries? newPage =
-                          await readDiarybyDate(memberId!, writeDate);
-                      if (newPage != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditDiaries(diary: newPage),
+                      Expanded(
+                        child: Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF98dfff),
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                        );
-                      } else {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddDiaries(
-                              memberId: memberId!,
-                              selectedDate: writeDate,
+                          child: const Text(
+                            '오늘 무슨 일이 있었는지 \n기룡이에게 솔직하게\n 털어 놓아 보아요!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'single_day',
                             ),
                           ),
-                        );
-                        //_updateWritedays(writeDate);
-                      }
-                    },
-                    child: SizedBox(
-                      width: 56.0,
-                      height: 56.0,
-                      child: Center(
-                        child: Image.asset('lib/assets/images/write.png'),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onDoubleTap: () {},
+                        onTap: () async {
+                          Diaries? newPage =
+                              await readDiarybyDate(memberId, writeDate);
+                          if (newPage != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditDiaries(diary: newPage),
+                              ),
+                            );
+                          } else {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddDiaries(
+                                  memberId: memberId,
+                                  selectedDate: writeDate,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: SizedBox(
+                          width: 56.0,
+                          height: 56.0,
+                          child: Center(
+                            child: Image.asset('lib/assets/images/write.png'),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
                   ),
-                  const SizedBox(width: 10),
                 ],
               ),
             ),

@@ -1018,6 +1018,25 @@
             "outputFile": "com.example.capstones.app-merged_res-7:/values_values.arsc.flat",
             "map": [
                 {
+                    "source": "C:\\Capstone\\ljy\\capstones\\android\\app\\src\\main\\res\\values\\styles.xml",
+                    "from": {
+                        "startLines": "3,14",
+                        "startColumns": "4,4",
+                        "startOffsets": "176,832",
+                        "endLines": "7,16",
+                        "endColumns": "12,12",
+                        "endOffsets": "483,998"
+                    },
+                    "to": {
+                        "startLines": "113,117",
+                        "startColumns": "4,4",
+                        "startOffsets": "6822,7003",
+                        "endLines": "116,119",
+                        "endColumns": "12,12",
+                        "endOffsets": "6998,7167"
+                    }
+                },
+                {
                     "source": "C:\\Users\\LG\\.gradle\\caches\\transforms-3\\2534cb10a453dd1f7318651afba4a7a8\\transformed\\jetified-window-1.0.0-beta04\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2,7,8,9,10,11,19,23,34,51",
@@ -1034,25 +1053,6 @@
                         "endLines": "7,8,9,10,80,138,142,259,271,279",
                         "endColumns": "11,59,51,44,59,24,24,24,24,24",
                         "endOffsets": "289,349,401,446,4910,8259,8390,12437,12877,13186"
-                    }
-                },
-                {
-                    "source": "C:\\Capstone\\Capstones\\capstones\\android\\app\\src\\main\\res\\values\\styles.xml",
-                    "from": {
-                        "startLines": "3,14",
-                        "startColumns": "4,4",
-                        "startOffsets": "176,832",
-                        "endLines": "7,16",
-                        "endColumns": "12,12",
-                        "endOffsets": "483,998"
-                    },
-                    "to": {
-                        "startLines": "113,117",
-                        "startColumns": "4,4",
-                        "startOffsets": "6822,7003",
-                        "endLines": "116,119",
-                        "endColumns": "12,12",
-                        "endOffsets": "6998,7167"
                     }
                 },
                 {
@@ -1387,7 +1387,7 @@
             "outputFile": "com.example.capstones.app-merged_res-7:/values-night-v8_values-night-v8.arsc.flat",
             "map": [
                 {
-                    "source": "C:\\Capstone\\Capstones\\capstones\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "C:\\Capstone\\ljy\\capstones\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

@@ -5,24 +5,24 @@ import 'package:capstones/widgets/KeyWordToMusic.dart';
 class KeyWord extends StatefulWidget {
   const KeyWord({super.key});
 
-  @override
+@override
   _KeyWordState createState() => _KeyWordState();
 }
 
 class _KeyWordState extends State<KeyWord> {
   late String selectedEmotion;
 
-  void _onEmotionSelected(String emotion) {
-    setState(() {
-      selectedEmotion = emotion;
-    });
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => KeyWordToMusic(emotion: emotion),
-      ),
-    );
-  }
+void _onEmotionSelected(String emotion) {
+  setState(() {
+    selectedEmotion = emotion;
+  });
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => KeyWordToMusic(emotion: emotion),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -113,31 +113,31 @@ class _KeyWordState extends State<KeyWord> {
     );
   }
 
-  Widget _buildEmotionWidget(String text, String imagePath) {
-    return GestureDetector(
-      onTap: () {
-        _onEmotionSelected(text); // 이미지를 클릭하여 해당 감정을 선택할 때 해당 감정 텍스트를 매개변수로 전달
-      },
-      child: Column(
-        children: [
-          SizedBox(
-            width: 120,
-            height: 120,
-            child: Image.asset(
-              imagePath,
-            ),
+Widget _buildEmotionWidget(String text, String imagePath) {
+  return GestureDetector(
+    onTap: () {
+      _onEmotionSelected(text); // 이미지를 클릭하여 해당 감정을 선택할 때 해당 감정 텍스트를 매개변수로 전달
+    },
+    child: Column(
+      children: [
+        SizedBox(
+          width: 120,
+          height: 120,
+          child: Image.asset(
+            imagePath,
           ),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontFamily: 'single_day',
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 20,
+            fontFamily: 'single_day',
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }

@@ -1,14 +1,23 @@
 import 'package:capstones/screens/chat.dart';
 import 'package:capstones/screens/diary.dart';
+import 'package:capstones/models/diary_model.dart';
 import 'package:capstones/screens/greeting.dart';
 import 'package:capstones/screens/setting.dart';
-import 'package:capstones/Music.dart';
+import 'package:capstones/music.dart';
 import 'package:capstones/screens/statistics.dart';
 import 'package:flutter/material.dart';
 
 class LoginedMain extends StatefulWidget {
   final String memberId;
-  const LoginedMain({super.key, required this.memberId});
+  final String selectedDate;
+  final String? selectedEmotion;
+
+  const LoginedMain({
+    super.key,
+    required this.memberId,
+    required this.selectedDate,
+    this.selectedEmotion,
+  });
 
   @override
   State<LoginedMain> createState() => _LoginedMainState();
@@ -16,18 +25,33 @@ class LoginedMain extends StatefulWidget {
 
 class _LoginedMainState extends State<LoginedMain> {
   late String memberId;
+  late String selectedDate;
+  String? selectedEmotion;
 
   @override
   void initState() {
     super.initState();
     memberId = widget.memberId;
+    selectedDate = widget.selectedDate;
+    selectedEmotion = widget.selectedEmotion;
   }
 
-  int bottomNavIndex = 1;
+  int bottomNavIndex = 2;
+
+  void updateEmotion(String emotion) {
+    setState(() {
+      selectedEmotion = emotion;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+     return WillPopScope(
+    onWillPop: () async {
+      // 뒤로 가기 동작을 막습니다.
+      return false;
+    },
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: IndexedStack(
@@ -37,22 +61,25 @@ class _LoginedMainState extends State<LoginedMain> {
               style: TextStyle(fontFamily: 'single_day'),
               child: Chat(),
             ),
+            DefaultTextStyle(
+              style: const TextStyle(fontFamily: 'single_day'),
+              child: Diary(
+                memberId: memberId,
+                updateEmotion: updateEmotion,
+              ),
+            ),
             const DefaultTextStyle(
               style: TextStyle(fontFamily: 'single_day'),
               child: GreetingPage(),
             ),
-            const DefaultTextStyle(
-              style: TextStyle(fontFamily: 'single_day'),
-              child: Diary(),
+            DefaultTextStyle(
+              style: const TextStyle(fontFamily: 'single_day'),
+              child: Music(
+                memberId: memberId,
+                selectedDate: selectedDate,
+                selectedEmotionFromDiary: selectedEmotion,
+              ),
             ),
-            const DefaultTextStyle(
-              style: TextStyle(fontFamily: 'single_day'),
-              child: Music(),
-            ),
-            // DefaultTextStyle(
-            //   style: TextStyle(fontFamily: 'single_day'),
-            //   child: Setting(),
-            // ),
             DefaultTextStyle(
               style: const TextStyle(fontFamily: 'single_day'),
               child: Statistics(
@@ -95,12 +122,12 @@ class _LoginedMainState extends State<LoginedMain> {
                   height: 24,
                   width: 24,
                   child: Image.asset(
-                    'lib/assets/images/home.png',
+                    'lib/assets/images/diary.png',
                     fit: BoxFit.fill,
                   ),
                 ),
               ),
-              label: '홈',
+              label: '감정일기',
             ),
             BottomNavigationBarItem(
               icon: Padding(
@@ -109,12 +136,12 @@ class _LoginedMainState extends State<LoginedMain> {
                   height: 24,
                   width: 24,
                   child: Image.asset(
-                    'lib/assets/images/diary.png',
+                    'lib/assets/images/home.png',
                     fit: BoxFit.fill,
                   ),
                 ),
               ),
-              label: '감정일기',
+              label: '홈',
             ),
             BottomNavigationBarItem(
               icon: Padding(
@@ -140,6 +167,7 @@ class _LoginedMainState extends State<LoginedMain> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

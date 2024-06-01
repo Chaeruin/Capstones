@@ -36,22 +36,34 @@ class _TotalEmotionState extends State<TotalEmotion> {
 
   @override
   Widget build(BuildContext context) {
-    return SmartRefresher(
-      controller: _refreshController,
-      enablePullDown: true,
-      onRefresh: _onRefresh,
-      child: FutureBuilder(
-        future: sentiment,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return _buildChart(snapshot);
-          }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      ),
+    return Column(
+      children: [ // 위에 여백을 추가하고 싶다면 사용
+        const Text(
+          '월간 감정 통계', // 원하는 텍스트로 변경
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,fontFamily: 'single_day',), // 적절한 크기로 텍스트 스타일 설정
+        ),
+        const SizedBox(height: 5), // 텍스트와 리프레셔 사이의 간격
+        Expanded(
+          child: SmartRefresher(
+            controller: _refreshController,
+            enablePullDown: true,
+            onRefresh: _onRefresh,
+            child: FutureBuilder(
+              future: sentiment,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return _buildChart(snapshot);
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
+
   }
 }
 
@@ -68,38 +80,41 @@ Widget _buildChart(AsyncSnapshot<MonthlyEmotion> snapshot) {
   double tiredness = (double.parse(sentiment.tiredness.replaceAll('%', '')));
   double regret = (double.parse(sentiment.regret.replaceAll('%', '')));
 
-  final List chartData = [
-    _ChartData('joy', joy),
-    _ChartData('hope', hope),
-    _ChartData('neutrality', neutrality),
-    _ChartData('sadness', sadness),
-    _ChartData('anger', anger),
-    _ChartData('anxiety', anxiety),
-    _ChartData('tiredness', tiredness),
-    _ChartData('regret', regret),
+  final List<_ChartData> chartData = [
+    _ChartData('기쁨', joy, const Color.fromARGB(255, 251, 238, 121)),
+    _ChartData('희망', hope, const Color.fromARGB(255, 167, 252, 169)),
+    _ChartData('중립', neutrality, const Color.fromARGB(255, 187, 187, 187)),
+    _ChartData('슬픔', sadness, const Color.fromARGB(255, 139, 203, 255)),
+    _ChartData('화남', anger, const Color.fromARGB(255, 255, 146, 138)),
+    _ChartData('불안', anxiety, const Color.fromARGB(255, 255, 169, 95)),
+    _ChartData('피곤', tiredness, const Color.fromARGB(255, 139, 150, 253)),
+    _ChartData('후회', regret, const Color.fromARGB(255, 255, 113, 205)),
   ];
 
   return SfCartesianChart(
-      primaryXAxis: const CategoryAxis(
-        labelStyle: TextStyle(fontSize: 8),
-      ),
-      primaryYAxis: const NumericAxis(
-        minimum: 0,
-        maximum: 50,
-        interval: 25,
-      ),
-      series: [
-        ColumnSeries(
-          dataSource: chartData,
-          xValueMapper: (chartData, _) => chartData.x,
-          yValueMapper: (chartData, _) => chartData.y,
-        )
-      ]);
+    primaryXAxis: const CategoryAxis(
+      labelStyle: TextStyle(fontSize: 12,fontFamily: 'single_day',),
+    ),
+    primaryYAxis: const NumericAxis(
+      minimum: 0,
+      maximum: 50,
+      interval: 25,
+    ),
+    series: [
+      ColumnSeries<_ChartData, String>(
+        dataSource: chartData,
+        xValueMapper: (chartData, _) => chartData.x,
+        yValueMapper: (chartData, _) => chartData.y,
+        pointColorMapper: (chartData, _) => chartData.color,
+      )
+    ],
+  );
 }
 
 class _ChartData {
-  _ChartData(this.x, this.y);
+  _ChartData(this.x, this.y, this.color);
 
   final String x;
   final double y;
+  final Color color;
 }

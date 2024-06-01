@@ -1,225 +1,336 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:capstones/models/MonthStatistics_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:capstones/widgets/phq9_back.dart';
+import 'package:intl/intl.dart'; // Add this line to import the intl package for date formatting
 
-class MonthStatisticsPage extends StatelessWidget {
-  const MonthStatisticsPage({super.key});
+class PHQ9 extends StatefulWidget {
+  final String memberId;
+  final DateTime? selectedDate;
+
+  const PHQ9({super.key, required this.memberId, this.selectedDate});
+
+  @override
+  State<PHQ9> createState() => _PHQ9State();
+}
+
+class _PHQ9State extends State<PHQ9> {
+  late String memberId;
+  DateTime? selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    memberId = widget.memberId;
+    selectedDate = widget.selectedDate;
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<MonthStatistics> model = [
-      MonthStatistics(
-          count: 20,
-          color: const Color.fromARGB(255, 253, 171, 248).withOpacity(1),
-          text: "기쁨"),
-      MonthStatistics(
-          count: 5,
-          color: const Color.fromARGB(255, 113, 202, 246).withOpacity(1),
-          text: "희망"),
-      MonthStatistics(count: 3, color: Colors.grey.withOpacity(1), text: "분노"),
-      MonthStatistics(
-          count: 10,
-          color: const Color.fromARGB(255, 250, 245, 95).withOpacity(1),
-          text: "불안"),
-      MonthStatistics(
-          count: 7,
-          color: const Color.fromARGB(255, 148, 252, 152).withOpacity(1),
-          text: "슬픔"),
-      MonthStatistics(
-          count: 20,
-          color: const Color.fromARGB(255, 118, 161, 255).withOpacity(1),
-          text: "중립"),
-      MonthStatistics(
-          count: 20,
-          color: const Color.fromARGB(255, 232, 151, 246).withOpacity(1),
-          text: "피곤"),
-      MonthStatistics(
-          count: 20,
-          color: const Color.fromARGB(255, 254, 151, 151).withOpacity(1),
-          text: "후회"),
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF87CEFA),
-        centerTitle: true,
-        title: const Text(
-          '이 달의 마음 통계',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 30,
-            fontFamily: 'single_day',
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return Phq9Back(
+                memberId: memberId,
+                selectedDate: selectedDate?.toIso8601String() ?? '',
+              );
+            },
+          ),
+        );
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            '우울증 건강설문(PHQ-9)',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xFFFB7474),
+              fontSize: 25,
+              fontFamily: 'single_day',
+            ),
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return Phq9Back(
+                      memberId: memberId,
+                      selectedDate: selectedDate?.toIso8601String() ?? '',
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        body: TableForm(memberId: memberId),
       ),
-      body: SingleChildScrollView(
+    );
+  }
+}
+
+class TableForm extends StatefulWidget {
+  final String memberId;
+  const TableForm({super.key, required this.memberId});
+
+  @override
+  _TableFormState createState() => _TableFormState();
+}
+
+class _TableFormState extends State<TableForm> {
+  int score = 0;
+  SharedPreferences? prefs;
+  List<String> testScore = [];
+  int bottomNavIndex = 0;
+
+  final List<int> _selectedValues = List.filled(9, 0);
+
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final testScoreList = prefs!.getStringList('testScore');
+
+    if (testScoreList == null) {
+      await prefs!.setStringList('testScore', []);
+    } else if (testScoreList.length == 2) {
+      testScoreList[0] = testScoreList[1];
+      testScore = testScoreList;
+    } else {
+      testScore = testScoreList;
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _updateTestScore(String score) async {
+    testScore.add(score);
+    await prefs!.setStringList('testScore', testScore);
+    setState(() {});
+  }
+
+  void _onCheckboxChanged(int questionIndex, int value) {
+    setState(() {
+      _selectedValues[questionIndex] = value;
+      score = _selectedValues.reduce((a, b) => a + b);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initPrefs();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            Row(
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const {
+                0: FlexColumnWidth(3),
+                1: FlexColumnWidth(0.5),
+                2: FlexColumnWidth(0.5),
+                3: FlexColumnWidth(0.5),
+                4: FlexColumnWidth(0.5),
+              },
               children: [
-                // 이미지 크기 조정
-                SizedBox(
-                  width: 150,
-                  height: 200,
-                  child: Image.asset('lib/assets/images/giryong.png'),
+                // Headline
+                const TableRow(
+                  children: [
+                    TableCell(child: Center(child: Text('문    항', style: TextStyle(fontSize: 20,fontFamily: 'single_day')))),
+                    TableCell(child: Center(child: Text('없음', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
+                    TableCell(child: Center(child: Text('2~6일', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
+                    TableCell(child: Center(child: Text('7~12일', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
+                    TableCell(child: Center(child: Text('거의\n매일', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
+                  ],
                 ),
-                Container(
-                  height: 100,
-                  width: 220,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF98dfff),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    '이번 달의 당신이 느낀 \n감정 비율이에요!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'single_day',
-                    ),
-                  ),
-                )
+                // Questions
+                _buildTableRow(
+                  questionIndex: 0,
+                  questionText: '기분이 가라앉거나, 우울하거나,\n 희망이 없다고 느꼈다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 1,
+                  questionText: '평소 하던 일에 대한 흥미가 \n없어지거나 즐거움을 느끼지 못했다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 2,
+                  questionText: '잠들기가 어렵거나 자주 깼다. \n 혹은 너무 많이 잤다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 3,
+                  questionText: '평소보다 식욕이 줄었다. \n 혹은 평소보다 많이 먹었다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 4,
+                  questionText:
+                      '다른 사람들이 눈치 챌 정도로 평소보다 말과 행동이 느려졌다. \n 혹은 너무 안절부절 못해서 가만히 앉아있을 수 없었다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 5,
+                  questionText: '피곤하고 기운이 없었다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 6,
+                  questionText:
+                      '내가 잘못했거나, 실패했다는 생각이 들었다.\n 혹은 자신과 가족을 실망시켰다고 생각했다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 7,
+                  questionText: '신문을 읽거나 TV를 보는 것과 같은 일상적인 일에도 집중할 수가 없었다.',
+                ),
+                _buildTableRow(
+                  questionIndex: 8,
+                  questionText: '차라리 죽는 것은 더 낫겠다고 생각했다. \n 혹은 자해할 생각을 했다.',
+                ),
               ],
             ),
-
-            // Pie Chart 추가
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width,
-              child: CustomPaint(
-                size: Size(
-                  MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.width,
-                ),
-                painter: PieChartPainter(model),
-              ),
+            // Score and Result
+            IconButton(
+              onPressed: () {
+                _updateTestScore(score.toString());
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return SimpleDialog(
+                      title: const Text(
+                        '<검사결과>',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'single_day',
+                          color: Color(0xFFFB7474),
+                        ),
+                      ),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            '총 $score점 입니다!',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'single_day',
+                              color: Color.fromARGB(255, 106, 191, 255),
+                            ),
+                          ),
+                        ),
+                        if (score <= 4)
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              '우울 아님',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                            ),
+                          )
+                        else if (score > 4 && score <= 9)
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              '가벼운 우울',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                            ),
+                          )
+                        else if (score > 9 && score <= 19)
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              '중간 정도의 우울',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                            ),
+                          )
+                        else
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              '심한 우울',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.check),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class PieChartPainter extends CustomPainter {
-  final List<MonthStatistics> data;
-
-  PieChartPainter(this.data);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint circlePaint = Paint()..color = Colors.white;
-
-    Offset offset = Offset(size.width / 2, size.width / 2);
-    double radius = (size.width / 2) * 0.8;
-    canvas.drawCircle(offset, radius, circlePaint);
-
-    double startPoint = -math.pi / 2; // 시작 각도 초기화
-
-    // "기쁨" 섹션을 먼저 그리도록 순서 변경
-    for (int i = 0; i < data.length; i++) {
-      if (data[i].text == "기쁨") {
-        double sweepAngle = 2 * math.pi * (data[i].count / 100);
-        circlePaint.color = data[i].color;
-
-        // 아크 그리기
-        canvas.drawArc(
-          Rect.fromCircle(
-              center: Offset(size.width / 2, size.width / 2), radius: radius),
-          startPoint,
-          sweepAngle,
-          true,
-          circlePaint,
-        );
-
-        // 중심 각도 계산
-        double angle = startPoint + sweepAngle / 2;
-
-        // 텍스트 그리기
-        TextSpan span = TextSpan(
-          text: data[i].text,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 17,
-            fontFamily: 'single_day',
+  TableRow _buildTableRow({required int questionIndex, required String questionText}) {
+    return TableRow(
+      children: [
+        TableCell(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              questionText,
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
-        );
-        TextPainter tp = TextPainter(
-          text: span,
-          textAlign: TextAlign.center,
-          textDirection: TextDirection.ltr,
-        );
-        tp.layout();
-
-        // 텍스트의 위치 계산
-        double textX = size.width / 2 + radius * 0.8 * math.cos(angle);
-        double textY = size.width / 2 + radius * 0.8 * math.sin(angle);
-
-        Offset textOffset = Offset(textX - tp.width / 2, textY - tp.height / 2);
-        tp.paint(canvas, textOffset);
-
-        // 다음 섹션의 시작 각도 계산
-        startPoint += sweepAngle;
-        break; // "기쁨" 섹션을 그린 후에는 종료
-      }
-    }
-
-    // 나머지 섹션 그리기
-    for (int i = 0; i < data.length; i++) {
-      if (data[i].text != "기쁨") {
-        double sweepAngle = 2 * math.pi * (data[i].count / 100);
-        circlePaint.color = data[i].color;
-
-        // 아크 그리기
-        canvas.drawArc(
-          Rect.fromCircle(
-              center: Offset(size.width / 2, size.width / 2), radius: radius),
-          startPoint,
-          sweepAngle,
-          true,
-          circlePaint,
-        );
-
-        // 중심 각도 계산
-        double angle = startPoint + sweepAngle / 2;
-
-        // 텍스트 그리기
-        TextSpan span = TextSpan(
-          text: data[i].text,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 17,
-            fontFamily: 'single_day',
+        ),
+        TableCell(
+          child: Center(
+            child: Radio<int>(
+              value: 0,
+              groupValue: _selectedValues[questionIndex],
+              onChanged: (value) {
+                _onCheckboxChanged(questionIndex, value!);
+              },
+            ),
           ),
-        );
-        TextPainter tp = TextPainter(
-          text: span,
-          textAlign: TextAlign.center,
-          textDirection: TextDirection.ltr,
-        );
-        tp.layout();
-
-        // 텍스트의 위치 계산
-        double textX = size.width / 2 + radius * 0.8 * math.cos(angle);
-        double textY = size.width / 2 + radius * 0.8 * math.sin(angle);
-
-        Offset textOffset = Offset(textX - tp.width / 2, textY - tp.height / 2);
-        tp.paint(canvas, textOffset);
-
-        // 다음 섹션의 시작 각도 계산
-        startPoint += sweepAngle;
-      }
-    }
+        ),
+        TableCell(
+          child: Center(
+            child: Radio<int>(
+              value: 1,
+              groupValue: _selectedValues[questionIndex],
+              onChanged: (value) {
+                _onCheckboxChanged(questionIndex, value!);
+              },
+            ),
+          ),
+        ),
+        TableCell(
+          child: Center(
+            child: Radio<int>(
+              value: 2,
+              groupValue: _selectedValues[questionIndex],
+              onChanged: (value) {
+                _onCheckboxChanged(questionIndex, value!);
+              },
+            ),
+          ),
+        ),
+        TableCell(
+          child: Center(
+            child: Radio<int>(
+              value: 3,
+              groupValue: _selectedValues[questionIndex],
+              onChanged: (value) {
+                _onCheckboxChanged(questionIndex, value!);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
