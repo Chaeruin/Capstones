@@ -163,8 +163,8 @@ class _DiaryState extends State<Diary> {
                   });
                 },
                 monthCellBuilder: (context, details) {
-                  final writedays = prefs!.getStringList('writedays');
-                  if (writedays!.isNotEmpty) {
+                  // final writedays = prefs!.getStringList('writedays');
+                  if (writedays.isNotEmpty) {
                     for (var day in writedays) {
                       if (day == DateFormat('yyyyMMdd').format(details.date)) {
                         return Center(
