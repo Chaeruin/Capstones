@@ -60,7 +60,7 @@ class _EditDiariesState extends State<EditDiaries> {
 
   Future<void> _initPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    final writedaysList = prefs!.getStringList('writedays');
+    final writedaysList = prefs!.getStringList(widget.diary.memberId);
 
     if (writedaysList == null) {
       await prefs!.setStringList('writedays', []);

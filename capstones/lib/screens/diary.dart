@@ -56,7 +56,7 @@ class _DiaryState extends State<Diary> {
   }
 
   Future<void> _updateWritedays() async {
-    final writedaysList = prefs!.getStringList('writedays');
+    final writedaysList = prefs!.getStringList(memberId);
 
     if (writedaysList != null) {
       writedays = writedaysList;
