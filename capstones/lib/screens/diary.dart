@@ -25,7 +25,6 @@ class Diary extends StatefulWidget {
 
 class _DiaryState extends State<Diary> {
   late DateTime selectedDate;
-  bool isWrite = false;
   late String memberId;
   String writeDate = DateFormat('yyyyMMdd').format(DateTime.now());
   final storage = const FlutterSecureStorage();
@@ -46,8 +45,6 @@ class _DiaryState extends State<Diary> {
     });
     _initPrefs();
     _refreshController = RefreshController(initialRefresh: false);
-    int currentMonth = DateTime.now().month;
-    int currentYear = DateTime.now().year;
   }
 
   Future<void> _initPrefs() async {
@@ -60,6 +57,8 @@ class _DiaryState extends State<Diary> {
 
     if (writedaysList != null) {
       writedays = writedaysList;
+    } else {
+      prefs!.setStringList(memberId, []);
     }
 
     if (mounted) {
@@ -69,7 +68,6 @@ class _DiaryState extends State<Diary> {
 
   Future<void> _onRefresh() async {
     _updateWritedays(); // writedays 리스트를 업데이트합니다.
-    print(writedays);
     setState(() {});
     _refreshController.refreshCompleted();
   }

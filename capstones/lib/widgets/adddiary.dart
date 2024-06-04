@@ -43,9 +43,7 @@ class _AddDiariesState extends State<AddDiaries> {
     prefs = await SharedPreferences.getInstance();
     final writedaysList = prefs!.getStringList(widget.memberId);
 
-    if (writedaysList == null) {
-      await prefs!.setStringList('writedays', []);
-    } else {
+    if (writedaysList != null) {
       writedays = writedaysList;
     }
 
@@ -57,8 +55,7 @@ class _AddDiariesState extends State<AddDiaries> {
   void _updateWritedays(String date) async {
     writedays.add(date);
     await prefs!.setStringList(
-        'writedays', writedays); // writedays 리스트를 SharedPreferences에 저장합니다.
-    print(writedays);
+        widget.memberId, writedays); // writedays 리스트를 SharedPreferences에 저장합니다.
     setState(() {});
   }
 

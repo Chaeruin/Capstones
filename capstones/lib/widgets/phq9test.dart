@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capstones/widgets/phq9_back.dart';
-import 'package:intl/intl.dart'; // Add this line to import the intl package for date formatting
 
 class PHQ9 extends StatefulWidget {
   final String memberId;
@@ -148,11 +147,31 @@ class _TableFormState extends State<TableForm> {
                 // Headline
                 const TableRow(
                   children: [
-                    TableCell(child: Center(child: Text('문    항', style: TextStyle(fontSize: 20,fontFamily: 'single_day')))),
-                    TableCell(child: Center(child: Text('없음', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
-                    TableCell(child: Center(child: Text('2~6일', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
-                    TableCell(child: Center(child: Text('7~12일', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
-                    TableCell(child: Center(child: Text('거의\n매일', style: TextStyle(fontSize: 18,fontFamily: 'single_day')))),
+                    TableCell(
+                        child: Center(
+                            child: Text('문    항',
+                                style: TextStyle(
+                                    fontSize: 20, fontFamily: 'single_day')))),
+                    TableCell(
+                        child: Center(
+                            child: Text('없음',
+                                style: TextStyle(
+                                    fontSize: 18, fontFamily: 'single_day')))),
+                    TableCell(
+                        child: Center(
+                            child: Text('2~6일',
+                                style: TextStyle(
+                                    fontSize: 18, fontFamily: 'single_day')))),
+                    TableCell(
+                        child: Center(
+                            child: Text('7~12일',
+                                style: TextStyle(
+                                    fontSize: 18, fontFamily: 'single_day')))),
+                    TableCell(
+                        child: Center(
+                            child: Text('거의\n매일',
+                                style: TextStyle(
+                                    fontSize: 18, fontFamily: 'single_day')))),
                   ],
                 ),
                 // Questions
@@ -231,7 +250,8 @@ class _TableFormState extends State<TableForm> {
                             child: Text(
                               '우울 아님',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                              style: TextStyle(
+                                  fontSize: 20, fontFamily: 'single_day'),
                             ),
                           )
                         else if (score > 4 && score <= 9)
@@ -240,7 +260,8 @@ class _TableFormState extends State<TableForm> {
                             child: Text(
                               '가벼운 우울',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                              style: TextStyle(
+                                  fontSize: 20, fontFamily: 'single_day'),
                             ),
                           )
                         else if (score > 9 && score <= 19)
@@ -249,7 +270,8 @@ class _TableFormState extends State<TableForm> {
                             child: Text(
                               '중간 정도의 우울',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                              style: TextStyle(
+                                  fontSize: 20, fontFamily: 'single_day'),
                             ),
                           )
                         else
@@ -258,7 +280,8 @@ class _TableFormState extends State<TableForm> {
                             child: Text(
                               '심한 우울',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20, fontFamily: 'single_day'),
+                              style: TextStyle(
+                                  fontSize: 20, fontFamily: 'single_day'),
                             ),
                           ),
                       ],
@@ -274,7 +297,8 @@ class _TableFormState extends State<TableForm> {
     );
   }
 
-  TableRow _buildTableRow({required int questionIndex, required String questionText}) {
+  TableRow _buildTableRow(
+      {required int questionIndex, required String questionText}) {
     return TableRow(
       children: [
         TableCell(

@@ -6,16 +6,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'package:url_launcher/url_launcher_string.dart';
 
 enum DataKind { OK }
+
 enum Kind { NONE, EMPATHY, OVERCOME }
+
 // ignore: unused_element
 String? _selectedEmotion;
 
 Future<String?> fetchString(DataKind dataKind, String memberId) async {
   final Uri url = Uri.parse('http://3.35.183.52:8081/music/recommendation');
-  
+
   DateTime now = DateTime.now();
   String writeDate = DateFormat('yyyyMMdd').format(now);
   Diaries? selectedDiary = await readDiarybyDate(memberId, writeDate);
@@ -42,7 +43,6 @@ Future<String?> fetchString(DataKind dataKind, String memberId) async {
   return response.body;
 }
 
-
 class Extant extends StatefulWidget {
   final String selectedEmotion;
   final String memberId;
@@ -61,128 +61,118 @@ class Extant extends StatefulWidget {
 
 class _ExtantState extends State<Extant> {
   String _selectedCategory = 'empathy';
-  final String musicRecommendationUrl = 'https://youtu.be/XEfle_XvYiw?si=sS2MryzR7k2d6z3w';
-  final ScrollController _scrollController = ScrollController(); 
+  final String musicRecommendationUrl =
+      'https://youtu.be/XEfle_XvYiw?si=sS2MryzR7k2d6z3w';
+  final ScrollController _scrollController = ScrollController();
 
-  
   Kind mKind = Kind.NONE;
   DataKind nKind = DataKind.OK;
 
   Widget makeChild(String str, Kind kind) {
-  Map<String, dynamic> items = jsonDecode(str);
+    Map<String, dynamic> items = jsonDecode(str);
 
-  List<Widget> widgetListA = [];
-  List<Widget> widgetListB = [];
-  switch (kind) {
-    case Kind.NONE:
-      return Container(); // Return an empty container when no category is selected
+    List<Widget> widgetListA = [];
+    List<Widget> widgetListB = [];
+    switch (kind) {
+      case Kind.NONE:
+        return Container(); // Return an empty container when no category is selected
 
-    case Kind.EMPATHY:
-      for (int i = 0; i < 5; i++) {
-        final musicName = items['empathy'][i]['name'];
-        final musicArtist = items['empathy'][i]['artist'];
-        widgetListA.add(
-          Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network(items['empathy'][i]['image']),
-                  const SizedBox(height: 20),
-                  const SizedBox(width: 50),
-                  InkWell(
-                    onTap: () {
-                     //_launchURL(musicRecommendationUrl);
-                    },
-                    child: Container(
-                      width: 200,
-                      height: 100,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            musicName,
-                            style: const TextStyle (
-                              fontSize: 18,
-                              color: Color.fromARGB(255, 0, 89, 130),
-                            ),
+      case Kind.EMPATHY:
+        for (int i = 0; i < 5; i++) {
+          final musicName = items['empathy'][i]['name'];
+          final musicArtist = items['empathy'][i]['artist'];
+          widgetListA.add(Column(children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.network(items['empathy'][i]['image']),
+                const SizedBox(height: 20),
+                const SizedBox(width: 50),
+                InkWell(
+                  onTap: () {
+                    //_launchURL(musicRecommendationUrl);
+                  },
+                  child: Container(
+                    width: 200,
+                    height: 100,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          musicName,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 0, 89, 130),
                           ),
-                          Text(
-                            musicArtist,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Color.fromARGB(255, 0, 145, 211),
-                            ),
+                        ),
+                        Text(
+                          musicArtist,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Color.fromARGB(255, 0, 145, 211),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ]
-          )
-        );
-      }
-      return Column(children: widgetListA);
+                ),
+              ],
+            ),
+          ]));
+        }
+        return Column(children: widgetListA);
 
-    case Kind.OVERCOME:
-      
-      for (int i = 0; i < 5; i++) {
-        final musicName = items['overcome'][i]['name'];
-        final musicArtist = items['overcome'][i]['artist'];
-        widgetListB.add(
-          Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network(items['overcome'][i]['image']),
-                  const SizedBox(height: 20),
-                  const SizedBox(width: 50),
-                  InkWell(
-                    onTap: () {
-                      //_launchURL(musicRecommendationUrl);
-                    },
-                    child: Container(
-                      width: 200,
-                      height: 100,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            musicName,
-                            style: const TextStyle (
-                              fontSize: 18,
-                              color: Color.fromARGB(255, 0, 89, 130),
-                            ),
+      case Kind.OVERCOME:
+        for (int i = 0; i < 5; i++) {
+          final musicName = items['overcome'][i]['name'];
+          final musicArtist = items['overcome'][i]['artist'];
+          widgetListB.add(Column(children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.network(items['overcome'][i]['image']),
+                const SizedBox(height: 20),
+                const SizedBox(width: 50),
+                InkWell(
+                  onTap: () {
+                    //_launchURL(musicRecommendationUrl);
+                  },
+                  child: Container(
+                    width: 200,
+                    height: 100,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          musicName,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 0, 89, 130),
                           ),
-                          Text(
-                            musicArtist,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Color.fromARGB(255, 0, 145, 211),
-                            ),
+                        ),
+                        Text(
+                          musicArtist,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Color.fromARGB(255, 0, 145, 211),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ]
-          )
-        );
-      }
-      return Column(children: widgetListB);
-  
-    default:
-      return Column(children: widgetListA);
+                ),
+              ],
+            ),
+          ]));
+        }
+        return Column(children: widgetListB);
+
+      default:
+        return Column(children: widgetListA);
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -305,15 +295,15 @@ class _ExtantState extends State<Extant> {
                                   controller: _scrollController,
                                   child: Column(
                                     children: [
-                                      if (snapshot.hasData) 
+                                      if (snapshot.hasData)
                                         makeChild(snapshot.data!, mKind)
-                                      else if (snapshot.hasError) 
+                                      else if (snapshot.hasError)
                                         Text('${snapshot.error}')
-                                      else 
+                                      else
                                         const CircularProgressIndicator(),
                                     ],
                                   ),
-                                ), 
+                                ),
                               ),
                             ),
                           ],
@@ -335,14 +325,13 @@ class _ExtantState extends State<Extant> {
   }
 }
 
-  void _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
+void _launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
   }
-
+}
 
 class MusicRecommendationItem extends StatelessWidget {
   final String imageUrl;
@@ -350,7 +339,8 @@ class MusicRecommendationItem extends StatelessWidget {
   final String artist;
   final String url;
 
-  const MusicRecommendationItem({super.key, 
+  const MusicRecommendationItem({
+    super.key,
     required this.imageUrl,
     required this.title,
     required this.artist,

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:vertical_barchart/extension/expandedSection.dart';
 import 'package:vertical_barchart/vertical-barchart.dart';
 import 'package:vertical_barchart/vertical-barchartmodel.dart';
-import 'package:vertical_barchart/vertical-legend.dart';
 
 class Statics extends StatefulWidget {
   final Map<String, dynamic> sentiment;

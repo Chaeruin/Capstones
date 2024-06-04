@@ -62,9 +62,7 @@ class _EditDiariesState extends State<EditDiaries> {
     prefs = await SharedPreferences.getInstance();
     final writedaysList = prefs!.getStringList(widget.diary.memberId);
 
-    if (writedaysList == null) {
-      await prefs!.setStringList('writedays', []);
-    } else {
+    if (writedaysList != null) {
       writedays = writedaysList;
     }
 
@@ -75,9 +73,8 @@ class _EditDiariesState extends State<EditDiaries> {
 
   void _updateWritedays(String date) async {
     writedays.remove(date);
-    await prefs!.setStringList(
-        'writedays', writedays); // writedays 리스트를 SharedPreferences에 저장합니다.
-    print(writedays);
+    await prefs!.setStringList(widget.diary.memberId,
+        writedays); // writedays 리스트를 SharedPreferences에 저장합니다.
     setState(() {});
   }
 

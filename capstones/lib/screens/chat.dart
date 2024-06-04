@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:capstones/loginedmain.dart';
-import 'package:capstones/screens/greeting.dart';
+
 class Chat extends StatefulWidget {
   const Chat({super.key, this.memberId});
 
@@ -163,39 +162,39 @@ class ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
-          centerTitle: true,
-          title: const Text(
-            textAlign: TextAlign.center,
-            '기룡이',
-            style: TextStyle(
-              color: Color.fromARGB(255, 49, 135, 255),
-              fontSize: 25,
-              fontFamily: 'single_day',
-            ),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          textAlign: TextAlign.center,
+          '기룡이',
+          style: TextStyle(
+            color: Color.fromARGB(255, 49, 135, 255),
+            fontSize: 25,
+            fontFamily: 'single_day',
           ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return const Chat();
-                  },
-                ),
-              );
-            },
-          ),
-          backgroundColor: const Color(0xFF98DFFF),
-          bottom: PreferredSize(
-    preferredSize: const Size.fromHeight(5.0),
-    child: Container(
-      height: 3.0,
-      color: const Color.fromARGB(255, 255, 255, 255),
-    ),
-  ),
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return const Chat();
+                },
+              ),
+            );
+          },
+        ),
+        backgroundColor: const Color(0xFF98DFFF),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(5.0),
+          child: Container(
+            height: 3.0,
+            color: const Color.fromARGB(255, 255, 255, 255),
+          ),
+        ),
+      ),
       backgroundColor: const Color(0xFF98DFFF),
       body: GestureDetector(
         onTap: () {
